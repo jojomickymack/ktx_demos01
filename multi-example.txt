@@ -1,0 +1,57 @@
+multimedia
+  textures
+  looping music
+  sound fx
+
+screen concepts
+  screen swapping
+  transitions
+  pausing
+
+animation
+  sprites/bunnymark
+  keyframe animations
+
+multi stage/view
+  scrolling background
+  parallax scrolling background
+  background foreground gui
+
+physics
+  box2d
+  box2d tiled map integration
+  arcade physics implementation
+
+input
+  keyboard
+  on screen controls
+  gamepad
+  gyroscope
+
+tiled map loading
+  loading/scrolling
+  tile pooling for collision detection
+  object loading and parsing
+  multi level loading
+
+scene2d
+  included actors (window/label)
+  custom actors
+  actions
+  actor groups/action sequences
+    
+narrative/cutscene
+  1 off animations
+  window/textbox with animations for narrative
+  hard coded scripts for narrative queues
+  dynamically loaded scripts for narrative queues
+  
+entity component system
+  basic implementaion
+  tiled map with collision implementation
+  enemies that hurt/npcs that show dialog
+
+classic game section
+  space invaders
+  asteroids
+  lunar lander
