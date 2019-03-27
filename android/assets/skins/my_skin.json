@@ -1,12 +1,18 @@
 {
 com.badlogic.gdx.graphics.g2d.BitmapFont: {
-	SDS_6x6: {
-		file: SDS_6x6.fnt
+	carbontype: {
+		file: carbontype.fnt
 	}
 }
 com.badlogic.gdx.graphics.Color: {
 	black: {
 		r: 0
+		g: 0
+		b: 0
+		a: 1
+	}
+	red: {
+		r: 1
 		g: 0
 		b: 0
 		a: 1
@@ -20,12 +26,27 @@ com.badlogic.gdx.graphics.Color: {
 }
 com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 	default: {
-		font: SDS_6x6
+		font: carbontype
 		fontColor: black
 	}
-	transparent: {
-		font: SDS_6x6
+	black-bg: {
+		font: carbontype
 		fontColor: white
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
+	default: {
+		font: carbontype
+		fontColorSelected: red
+		fontColorUnselected: white
+		selection: white
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
+	default: {
+		font: carbontype
+		fontColor: white
+		over: window-white-bg
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
@@ -35,14 +56,14 @@ com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
 }
 com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
 	default: {
-		background: transparent
-		titleFont: SDS_6x6
+		background: window-white-bg
+		titleFont: carbontype
 		titleFontColor: black
 	}
-	transparent: {
-		background: transparent
-		titleFont: SDS_6x6
-		titleFontColor: black
+	black-bg: {
+		background: window-black-bg
+		titleFont: carbontype
+		titleFontColor: white
 	}
 }
 }

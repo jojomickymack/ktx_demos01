@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.central.input.GamepadCtl
 import com.central.input.InputCtl
 import org.central.assets.*
+import org.central.assets.Tunes.*
 import org.central.screens.*
 import ktx.app.KtxGame
 
@@ -79,12 +80,16 @@ class App : KtxGame<Screen>() {
             this.tunesManager.update()
         }
 
+        theme().volume = 0.5f
+        theme().play()
+
         val demo1 = IntroScr(this)
 
         //addScreen(IntroScr(this))
         addScreen(TitleScr(this))
         addScreen(MenuScr(this))
         addScreen(Demo1Scr(this))
+        addScreen(Demo2Scr(this))
 
         addScreen(demo1)
         setScreen<IntroScr>()

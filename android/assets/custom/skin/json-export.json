@@ -1,0 +1,62 @@
+{
+com.badlogic.gdx.graphics.g2d.BitmapFont: {
+	carbontype: {
+		file: carbontype.fnt
+	}
+}
+com.badlogic.gdx.graphics.Color: {
+	black: {
+		r: 0
+		g: 0
+		b: 0
+		a: 1
+	}
+	red: {
+		r: 1
+		g: 0
+		b: 0
+		a: 1
+	}
+	white: {
+		r: 1
+		g: 1
+		b: 1
+		a: 1
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
+	default: {
+		font: carbontype
+		fontColor: black
+	}
+	black-bg: {
+		font: carbontype
+		fontColor: white
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
+	default: {
+		font: carbontype
+		fontColorSelected: red
+		fontColorUnselected: white
+		selection: white
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
+	default: {
+		label: default
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
+	default: {
+		background: window-white-bg
+		titleFont: carbontype
+		titleFontColor: black
+	}
+	black-bg: {
+		background: window-black-bg
+		titleFont: carbontype
+		titleFontColor: white
+	}
+}
+}
