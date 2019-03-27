@@ -1,0 +1,48 @@
+{
+com.badlogic.gdx.graphics.g2d.BitmapFont: {
+	SDS_6x6: {
+		file: SDS_6x6.fnt
+	}
+}
+com.badlogic.gdx.graphics.Color: {
+	black: {
+		r: 0
+		g: 0
+		b: 0
+		a: 1
+	}
+	white: {
+		r: 1
+		g: 1
+		b: 1
+		a: 1
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
+	default: {
+		font: SDS_6x6
+		fontColor: black
+	}
+	transparent: {
+		font: SDS_6x6
+		fontColor: white
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
+	default: {
+		label: default
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
+	default: {
+		background: transparent
+		titleFont: SDS_6x6
+		titleFontColor: black
+	}
+	transparent: {
+		background: transparent
+		titleFont: SDS_6x6
+		titleFontColor: black
+	}
+}
+}
