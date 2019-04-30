@@ -10,7 +10,14 @@ enum class Images {
     introLogoTex,
     titleBgTex,
     titleLogoTex,
-    menuBgTex;
+    menuBgTex,
+    badlogic,
+    funny_face,
+    rock,
+    rock_n,
+    slime,
+    mask;
+
 
     val path = "images/${name}.png"
     fun load() = manager.load<Texture>(path)

@@ -7,7 +7,7 @@ import ktx.app.KtxScreen
 import ktx.graphics.*
 
 
-class Demo2Scr(val app: App) : KtxScreen {
+class Demo1(val app: App) : KtxScreen {
     private var rotation = 0.0f
 
     init {
@@ -21,22 +21,22 @@ class Demo2Scr(val app: App) : KtxScreen {
             use(Line) {
                 translate(app.stg.width / 2, app.stg.height / 2, 0f)
                 rotate(0f, 0f, 1f, rotation)
-                color = PINK
+                color = WHITE
                 rect(0f - 75, 0f - 75, 150f, 150f)
             }
 
             use(Filled) {
                 identity()
-                color = WHITE
+                color = RED
                 circle(0f, 0f, 200f, 25)
 
-                color = WHITE
+                color = PINK
                 circle(0f, app.stg.height, 200f, 25)
 
-                color = WHITE
+                color = YELLOW
                 circle(app.stg.width, app.stg.height, 200f, 25)
 
-                color = WHITE
+                color = BLUE
                 circle(app.stg.width, 0f, 200f, 25)
             }
         }

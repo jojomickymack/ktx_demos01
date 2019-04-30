@@ -8,31 +8,33 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.central.input.GamepadCtl
 import com.central.input.InputCtl
 import org.central.assets.*
 import org.central.assets.Tunes.*
 import org.central.screens.*
 import ktx.app.KtxGame
+import ktx.scene2d.Scene2DSkin
+
 
 class App : KtxGame<Screen>() {
 
-    val skinsManager = AssetManager()
     val textureManager = AssetManager()
     val soundsManager = AssetManager()
     val tunesManager = AssetManager()
 
-    private var width = 0f
-    private var height = 0f
+    var width = 0f
+    var height = 0f
 
-    private lateinit var sb: SpriteBatch
+    lateinit var sb: SpriteBatch
     private lateinit var hudSb: SpriteBatch
 
-    private lateinit var cam: OrthographicCamera
+    lateinit var cam: OrthographicCamera
     private lateinit var view: StretchViewport
     lateinit var stg: Stage
 
-    private lateinit var hudCam: OrthographicCamera
+    lateinit var hudCam: OrthographicCamera
     private lateinit var hudView: StretchViewport
     lateinit var hudStg: Stage
 
@@ -43,7 +45,8 @@ class App : KtxGame<Screen>() {
     var dialogMode = false
 
     override fun create() {
-        Skins.manager = this.skinsManager
+        Scene2DSkin.defaultSkin = Skin(Gdx.files.internal("skins/my_skin.json"))
+
         Images.manager = this.textureManager
         Sounds.manager = this.soundsManager
         Tunes.manager = this.tunesManager
@@ -67,14 +70,11 @@ class App : KtxGame<Screen>() {
         ic = InputCtl(this)
         gpc = GamepadCtl(this)
 
-        // load all the assets - todo - do this elsewhere
-        Skins.values().forEach { it.load() }
         Images.values().forEach { it.load() }
         Sounds.values().forEach { it.load() }
         Tunes.values().forEach { it.load() }
 
-        while (!this.skinsManager.update() || !tunesManager.update() || !soundsManager.update() || !textureManager.update()) {
-            this.skinsManager.update()
+        while (!tunesManager.update() || !soundsManager.update() || !textureManager.update()) {
             this.textureManager.update()
             this.soundsManager.update()
             this.tunesManager.update()
@@ -83,31 +83,42 @@ class App : KtxGame<Screen>() {
         theme().volume = 0.5f
         theme().play()
 
-        val demo1 = IntroScr(this)
+        val intro = Menu(this)
 
-        //addScreen(IntroScr(this))
-        addScreen(TitleScr(this))
-        addScreen(MenuScr(this))
-        addScreen(Demo1Scr(this))
-        addScreen(Demo2Scr(this))
+        addScreen(Intro(this))
+        addScreen(Title(this))
+        //addScreen(Menu(this))
+        addScreen(Demo1(this))
+        addScreen(Demo2(this))
+        addScreen(Stencil(this))
+        addScreen(Negative(this))
+        addScreen(Sepia(this))
+        addScreen(SimplexNoise(this))
+        addScreen(Blur(this))
+        addScreen(NormalsLighting(this))
+        addScreen(ModelView(this))
 
-        addScreen(demo1)
-        setScreen<IntroScr>()
+        addScreen(intro)
+        setScreen<Menu>()
     }
 
     override fun dispose() {
-        this.skinsManager.dispose()
         this.textureManager.dispose()
         this.soundsManager.dispose()
         this.tunesManager.dispose()
-        println("all assets disposed")
 
         this.sb.dispose()
         this.hudSb.dispose()
         this.stg.dispose()
         this.hudStg.dispose()
-        println("all spritebatches and stages disposed")
 
         super.dispose()
+    }
+
+    override fun resize(width: Int, height: Int) {
+        this.width = width.toFloat()
+        this.height = height.toFloat()
+//        this.cam.setToOrtho(false, this.width, this.height)
+        this.stg.batch.projectionMatrix = this.cam.combined
     }
 }

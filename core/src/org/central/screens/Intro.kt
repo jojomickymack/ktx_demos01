@@ -12,7 +12,7 @@ import ktx.app.KtxScreen
 import org.central.App
 
 
-class IntroScr(val app: App) : KtxScreen {
+class Intro(val app: App) : KtxScreen {
     private val bgImage = Image(introBgTex())
     private val logo = Image(introLogoTex())
 
@@ -35,7 +35,7 @@ class IntroScr(val app: App) : KtxScreen {
                 delay(2f),
                 fadeOut(2f),
                 Actions.run {
-                    app.setScreen<TitleScr>()
+                    app.setScreen<Title>()
                 }
         )
         app.stg += bgImage
@@ -66,7 +66,7 @@ class IntroScr(val app: App) : KtxScreen {
     fun checkInput() {
         if (app.ic.aPressed) {
             app.ic.aPressed = false
-            app.setScreen<TitleScr>()
+            app.setScreen<Title>()
         }
     }
 }

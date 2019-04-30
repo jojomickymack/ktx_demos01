@@ -11,7 +11,7 @@ import ktx.app.KtxScreen
 import org.central.App
 
 
-class TitleScr(val app: App) : KtxScreen {
+class Title(val app: App) : KtxScreen {
     private val bgImage = Image(titleBgTex())
     private val title = Image(titleLogoTex())
 
@@ -65,7 +65,7 @@ class TitleScr(val app: App) : KtxScreen {
     fun checkInput() {
         if (app.ic.aPressed) {
             app.ic.aPressed = false
-            app.setScreen<MenuScr>()
+            app.setScreen<Menu>()
         }
     }
 }
