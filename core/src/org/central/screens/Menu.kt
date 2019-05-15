@@ -30,6 +30,7 @@ class Menu(val app: App) : KtxScreen {
             textButton("simplex noise") { onClick { app.setScreen<SimplexNoise>() } }.cell(row = true)
             textButton("stencil") { onClick { app.setScreen<Stencil>() } }.cell(row = true)
             textButton("model view") { onClick { app.setScreen<ModelView>() } }.cell(row = true)
+            textButton("light shafts") { onClick { app.setScreen<Lightshafts>() } }.cell(row = true)
         }
 
         Gdx.input.inputProcessor = app.hudStg

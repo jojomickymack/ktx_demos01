@@ -31,7 +31,7 @@ class App : KtxGame<Screen>() {
     private lateinit var hudSb: SpriteBatch
 
     lateinit var cam: OrthographicCamera
-    private lateinit var view: StretchViewport
+    lateinit var view: StretchViewport
     lateinit var stg: Stage
 
     lateinit var hudCam: OrthographicCamera
@@ -97,6 +97,7 @@ class App : KtxGame<Screen>() {
         addScreen(Blur(this))
         addScreen(NormalsLighting(this))
         addScreen(ModelView(this))
+        addScreen(Lightshafts(this))
 
         addScreen(intro)
         setScreen<Menu>()
