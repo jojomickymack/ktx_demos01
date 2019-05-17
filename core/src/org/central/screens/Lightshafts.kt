@@ -7,132 +7,84 @@ import ktx.app.KtxScreen
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
-import com.badlogic.gdx.scenes.scene2d.Actor
 import org.central.App
-import org.central.assets.Images.small_sun
-import org.central.assets.Images.window
-
-
-class Sun : Actor() {
-
-    var texture = small_sun()
-
-    override fun draw(batch: Batch, parentAlpha: Float) {
-        batch.draw(texture, x, y)
-    }
-
-    fun dispose() {
-        texture.dispose()
-    }
-}
-
-
-class Window : Actor() {
-
-    var texture = window()
-
-    override fun draw(batch: Batch, parentAlpha: Float) {
-        batch.draw(texture, x, y)
-    }
-
-    fun dispose() {
-        texture.dispose()
-    }
-}
+import org.central.assets.Images.small_window_wall
 
 
 class Lightshafts(val app: App) : KtxScreen {
 
-    private val sun = Sun()
-    private var window = Window()
+    private val window = small_window_wall()
+    private val downscaleFactor = 3
 
-    private var fbo = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt(), app.height.toInt(), false)
+    private lateinit var occludersFbo: FrameBuffer
+    private lateinit var occlusionApprox: FrameBuffer
 
-    private val occludersFBO = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt(), app.height.toInt(), false)
-    private val occlusionApprox = FrameBuffer(Pixmap.Format.RGB888, app.width.toInt(), app.height.toInt(), false)
+    private val font = BitmapFont(Gdx.files.internal("fonts/SDS_6x6.fnt"), Gdx.files.internal("fonts/SDS_6x6.png"), false)
 
-    private val occluderShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/lightshaft.frag"))
     private val occlusionApproxShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/occlusion.frag"))
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        occludersFbo = FrameBuffer(Pixmap.Format.RGBA8888, width / downscaleFactor, height / downscaleFactor, false)
+        occlusionApprox = FrameBuffer(Pixmap.Format.RGB888, width / downscaleFactor, height / downscaleFactor, false)
+    }
+
+    override fun show() {
+        occludersFbo = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt() / downscaleFactor, app.height.toInt() / downscaleFactor, false)
+        occlusionApprox = FrameBuffer(Pixmap.Format.RGB888, app.width.toInt() / downscaleFactor, app.height.toInt() / downscaleFactor, false)
+        font.data.setScale(5f)
+    }
 
     override fun render(delta: Float) {
 
-        window.x = Gdx.input.x.toFloat()
-        window.y = app.height - Gdx.input.y.toFloat()
-
-        // Renders the occluders in black over the white sun
-        occludersFBO.begin()
+        // draws the black shape that blocks out the light
+        occludersFbo.begin()
 
         Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
-        app.sb.shader = occluderShader
         app.sb.begin()
-
-        occluderShader.setUniformf("color", Color.PINK)
-
-        sun.draw(app.sb, 1f)
-        app.sb.flush()
-
-        for (actor in listOf(window)) {
-            actor.draw(app.sb, 1f)
-        }
-
+        app.sb.draw(window, Gdx.input.x.toFloat() - window.width / 2, app.height - Gdx.input.y.toFloat() - window.height / 2)
         app.sb.end()
-        occludersFBO.end()
 
-        // Applies radial blur in order to obtain the "lightshaft" effect
+        occludersFbo.end()
+
+        // calculates all of the lightrays
         occlusionApprox.begin()
 
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
-        app.sb.disableBlending()
         app.sb.shader = occlusionApproxShader
+
         app.sb.begin()
-
-        occlusionApproxShader.setUniformf("cent", sun.x, sun.y)
-
-        app.sb.draw(occludersFBO.colorBufferTexture, 0f, 0f, app.width, app.height, 0f, 0f, 1f, 1f)
-
+        occlusionApproxShader.setUniformf("cent", 0.5f, 0.5f)
+        app.sb.draw(occludersFbo.colorBufferTexture, 0f, 0f, app.width, app.height, 0f, 0f, 1f, 1f)
         app.sb.end()
+
         occlusionApprox.end()
 
         // cleanup and reset operations
         app.view.apply()
-        app.sb.projectionMatrix = app.view.camera.combined
-        app.sb.enableBlending()
         app.sb.shader = null
-
-        //Render the whole scene in the FBO
-        fbo.begin()
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        app.sb.begin()
-
-        // Draw lightshafts
-        // app.sb.draw(occludersFBO.colorBufferTexture, 0f, 0f, app.width, app.height, 0f, 0f, 1f, 1f)
-        app.sb.draw(occlusionApprox.colorBufferTexture, 0f, 0f, app.width, app.height, 0f, 0f, 1f, 1f)
-
-        app.sb.end()
-        fbo.end()
 
         // Apply post processing
         app.sb.begin()
-        app.sb.draw(fbo.colorBufferTexture, 0f, 0f, app.width, app.height, 0f, 0f, 1f, 1f)
+        app.sb.draw(occlusionApprox.colorBufferTexture, 0f, 0f, app.width, app.height, 0f, 0f, 1f, 1f)
+        app.sb.end()
+
+        // log the fps on screen
+        app.sb.begin()
+        font.draw(app.sb, Gdx.graphics.framesPerSecond.toString(), 0f, font.lineHeight)
         app.sb.end()
     }
 
     override fun dispose() {
-        super.dispose()
-        sun.dispose()
-        window.dispose()
-        fbo.dispose()
-
-        occludersFBO.dispose()
+        occludersFbo.dispose()
         occlusionApprox.dispose()
-        occluderShader.dispose()
         occlusionApproxShader.dispose()
     }
 }
