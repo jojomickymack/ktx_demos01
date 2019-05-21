@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import ktx.app.KtxScreen
 import org.central.App
+import org.central.assets.Fonts
 import org.central.assets.Images.badlogic
 
 
@@ -14,11 +15,17 @@ class Stencil(val app: App) : KtxScreen {
     private val sr = ShapeRenderer()
     private var rotation = 1f
 
+    private val font = Fonts.SDS_6x6()
+
+    override fun show() {
+        font.data.setScale(app.fontSize)
+    }
+
     override fun render(delta: Float) {
         rotation += 1f
 
         //1. clear screen
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
         //2. clear our depth buffer with 1.0
         Gdx.gl.glClearDepthf(1f);
@@ -68,6 +75,11 @@ class Stencil(val app: App) : KtxScreen {
         }
 
         Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST)
+
+        // log the fps on screen
+        app.sb.begin()
+        font.draw(app.sb, Gdx.graphics.framesPerSecond.toString(), 0f, font.lineHeight)
+        app.sb.end()
     }
 
     override fun dispose() {

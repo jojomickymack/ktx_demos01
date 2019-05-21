@@ -21,11 +21,14 @@ import ktx.scene2d.Scene2DSkin
 class App : KtxGame<Screen>() {
 
     val textureManager = AssetManager()
-    val soundsManager = AssetManager()
-    val tunesManager = AssetManager()
+    val soundManager = AssetManager()
+    val tuneManager = AssetManager()
+    val fontManager = AssetManager()
 
     var width = 0f
     var height = 0f
+
+    val fontSize = 5f
 
     lateinit var sb: SpriteBatch
     private lateinit var hudSb: SpriteBatch
@@ -48,8 +51,9 @@ class App : KtxGame<Screen>() {
         Scene2DSkin.defaultSkin = Skin(Gdx.files.internal("skins/my_skin.json"))
 
         Images.manager = this.textureManager
-        Sounds.manager = this.soundsManager
-        Tunes.manager = this.tunesManager
+        Sounds.manager = this.soundManager
+        Tunes.manager = this.tuneManager
+        Fonts.manager = this.fontManager
 
         this.width = Gdx.graphics.height.toFloat()
         this.height = Gdx.graphics.width.toFloat()
@@ -73,11 +77,13 @@ class App : KtxGame<Screen>() {
         Images.values().forEach { it.load() }
         Sounds.values().forEach { it.load() }
         Tunes.values().forEach { it.load() }
+        Fonts.values().forEach { it.load() }
 
-        while (!tunesManager.update() || !soundsManager.update() || !textureManager.update()) {
+        while (!tuneManager.update() || !soundManager.update() || !textureManager.update() || !fontManager.update()) {
             this.textureManager.update()
-            this.soundsManager.update()
-            this.tunesManager.update()
+            this.soundManager.update()
+            this.tuneManager.update()
+            this.fontManager.update()
         }
 
         theme().volume = 0.5f
@@ -98,6 +104,7 @@ class App : KtxGame<Screen>() {
         addScreen(NormalsLighting(this))
         addScreen(ModelView(this))
         addScreen(Lightshafts(this))
+        addScreen(Water(this))
 
         addScreen(intro)
         setScreen<Menu>()
@@ -105,8 +112,9 @@ class App : KtxGame<Screen>() {
 
     override fun dispose() {
         this.textureManager.dispose()
-        this.soundsManager.dispose()
-        this.tunesManager.dispose()
+        this.soundManager.dispose()
+        this.tuneManager.dispose()
+        this.fontManager.dispose()
 
         this.sb.dispose()
         this.hudSb.dispose()
@@ -119,8 +127,7 @@ class App : KtxGame<Screen>() {
     override fun resize(width: Int, height: Int) {
         this.width = width.toFloat()
         this.height = height.toFloat()
-        this.cam.setToOrtho(false, width.toFloat(), height.toFloat())
+        this.cam.setToOrtho(false, this.width, this.height)
         this.stg.batch.projectionMatrix = this.cam.combined
-        this.stg.viewport.update(width, height, true)
     }
 }

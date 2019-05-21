@@ -2,13 +2,13 @@ package org.central.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.math.Vector3
 import ktx.app.KtxScreen
 import org.central.App
+import org.central.assets.Fonts
 import org.central.assets.Images.rock
 import org.central.assets.Images.rock_n
 
@@ -95,6 +95,7 @@ void main() {
     // Attenuation coefficients for light falloff
     val FALLOFF = Vector3(.4f, 3f, 20f)
 
+    private val font = Fonts.SDS_6x6()
 
     override fun show() {
         ShaderProgram.pedantic = false
@@ -124,7 +125,6 @@ void main() {
         app.stg.batch.shader = shader
 
         // handle mouse wheel
-        //handle mouse wheel
         Gdx.input.inputProcessor = object : InputAdapter() {
             override fun scrolled(delta: Int): Boolean {
                 //LibGDX mouse wheel is inverted compared to lwjgl-basics
@@ -133,15 +133,17 @@ void main() {
                 return true
             }
         }
+
+        font.data.setScale(app.fontSize)
     }
 
     override fun render(delta: Float) {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
         //reset light Z
         if (Gdx.input.isTouched) {
             LIGHT_POS.z = DEFAULT_LIGHT_Z
-            System.out.println("New light Z: "+LIGHT_POS.z)
+            System.out.println("New light Z: " + LIGHT_POS.z)
         }
 
         app.stg.batch.begin()
@@ -169,6 +171,11 @@ void main() {
         app.stg.batch.draw(rock, 0f, 0f, app.width, app.height)
 
         app.stg.batch.end()
+
+        // log the fps on screen
+        app.sb.begin()
+        font.draw(app.sb, Gdx.graphics.framesPerSecond.toString(), 0f, font.lineHeight)
+        app.sb.end()
     }
 
     override fun dispose() {

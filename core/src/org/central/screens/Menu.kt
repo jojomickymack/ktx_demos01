@@ -1,6 +1,7 @@
 package org.central.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.actions.Actions.*
 import com.badlogic.gdx.scenes.scene2d.ui.Image
@@ -16,12 +17,17 @@ import ktx.scene2d.textButton
 class Menu(val app: App) : KtxScreen {
     private val bgImage = Image(menuBgTex())
 
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        bgImage.setSize(width.toFloat(), height.toFloat())
+    }
+
     override fun show() {
 
         val table = table {
             setFillParent(true)
-            textButton("demo1") { onClick { app.setScreen<Demo1>() } }.cell(row = true)
-            textButton("demo2") { onClick { app.setScreen<Demo2>() } }.cell(row = true)
+//            textButton("demo1") { onClick { app.setScreen<Demo1>() } }.cell(row = true)
+//            textButton("demo2") { onClick { app.setScreen<Demo2>() } }.cell(row = true)
 
             textButton("blur") { onClick { app.setScreen<Blur>() } }.cell(row = true)
             textButton("negative") { onClick { app.setScreen<Negative>() } }.cell(row = true)
@@ -30,7 +36,8 @@ class Menu(val app: App) : KtxScreen {
             textButton("simplex noise") { onClick { app.setScreen<SimplexNoise>() } }.cell(row = true)
             textButton("stencil") { onClick { app.setScreen<Stencil>() } }.cell(row = true)
             textButton("model view") { onClick { app.setScreen<ModelView>() } }.cell(row = true)
-            textButton("light shafts") { onClick { app.setScreen<Lightshafts>() } }.cell(row = true)
+            textButton("lightshafts") { onClick { app.setScreen<Lightshafts>() } }.cell(row = true)
+            textButton("water") { onClick { app.setScreen<Water>() } }.cell(row = true)
         }
 
         Gdx.input.inputProcessor = app.hudStg

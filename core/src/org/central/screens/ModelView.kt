@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.AmbientLight
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
-import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.StretchViewport
@@ -19,9 +18,10 @@ import com.badlogic.gdx.utils.Array as GdxArray
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController
 import ktx.app.KtxScreen
 import org.central.App
+import org.central.assets.Fonts
 
 
-class ModelView(val application: App) : KtxScreen {
+class ModelView(val app: App) : KtxScreen {
 
     lateinit var stgMb: ModelBatch
     lateinit var hudMb: ModelBatch
@@ -50,19 +50,19 @@ class ModelView(val application: App) : KtxScreen {
     var controllers = GdxArray<AnimationController>()
     var loading = false
 
+    private val font = Fonts.SDS_6x6()
+
     override fun show() {
-        width = Gdx.graphics.width.toFloat()
-        height = Gdx.graphics.height.toFloat()
 
         stgMb = ModelBatch()
         hudMb = ModelBatch()
 
-        stgCam = PerspectiveCamera(10f, width, height)
+        stgCam = PerspectiveCamera(10f, app.width, app.height)
 
         stgView = StretchViewport(1024f, 768f, stgCam)
         stg = Stage(stgView)
 
-        hudCam = PerspectiveCamera(67f, width, height)
+        hudCam = PerspectiveCamera(67f, app.width, app.height)
         hudView = StretchViewport(1024f, 768f, hudCam)
         hudStg = Stage(hudView)
 
@@ -83,6 +83,8 @@ class ModelView(val application: App) : KtxScreen {
         assets.load(modelString, Model::class.java)
 
         loading = true
+
+        font.data.setScale(app.fontSize)
     }
 
     private fun doneLoading() {
@@ -123,6 +125,11 @@ class ModelView(val application: App) : KtxScreen {
         stgMb.begin(stgCam)
         stgMb.render(instances, environment)
         stgMb.end()
+
+        // log the fps on screen
+        app.sb.begin()
+        font.draw(app.sb, Gdx.graphics.framesPerSecond.toString(), 0f, font.lineHeight)
+        app.sb.end()
     }
 
     override fun dispose() {

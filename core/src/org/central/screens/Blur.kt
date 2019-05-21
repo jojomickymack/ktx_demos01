@@ -1,6 +1,7 @@
 package org.central.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -11,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.Texture.TextureFilter
 import ktx.app.KtxScreen
 import org.central.App
+import org.central.assets.Fonts
 import org.central.assets.Images.badlogic
 import org.central.assets.Images.funny_face
 
@@ -72,12 +74,31 @@ void main() {
     lateinit var blurTargetB: FrameBuffer
     lateinit var fboRegion: TextureRegion
 
-    val FBO_SIZE = 1024
-
     val MAX_BLUR = 2f
 
-    lateinit var fps:BitmapFont
+    private val font = Fonts.SDS_6x6()
 
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+
+        blurShader = ShaderProgram(VERT, FRAG)
+        if (!blurShader.isCompiled) {
+            System.err.println(blurShader.log)
+            System.exit(0)
+        }
+        if (blurShader.log.isNotEmpty()) println(blurShader.log)
+
+        //setup uniforms for our shader on resize
+        blurShader.begin()
+        blurShader.setUniformf("dir", 0f, 0f)
+        blurShader.setUniformf("resolution", width.toFloat())
+        blurShader.setUniformf("radius", 1f)
+        blurShader.end()
+
+        blurTargetA = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
+        blurTargetB = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
+        fboRegion = TextureRegion(blurTargetA.colorBufferTexture)
+    }
 
     override fun show() {
         tex1.setFilter(TextureFilter.Linear, TextureFilter.Linear)
@@ -96,16 +117,16 @@ void main() {
         //setup uniforms for our shader
         blurShader.begin()
         blurShader.setUniformf("dir", 0f, 0f)
-        blurShader.setUniformf("resolution", FBO_SIZE.toFloat())
+        blurShader.setUniformf("resolution", app.width)
         blurShader.setUniformf("radius", 1f)
         blurShader.end()
 
-        blurTargetA = FrameBuffer(Pixmap.Format.RGBA8888, FBO_SIZE, FBO_SIZE, false)
-        blurTargetB = FrameBuffer(Pixmap.Format.RGBA8888, FBO_SIZE, FBO_SIZE, false)
+        blurTargetA = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt(), app.height.toInt(), false)
+        blurTargetB = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt(), app.height.toInt(), false)
         fboRegion = TextureRegion(blurTargetA.colorBufferTexture)
         fboRegion.flip(false, true)
 
-        fps = BitmapFont()
+        font.data.setScale(app.fontSize)
     }
 
     private fun renderEntities(batch: SpriteBatch) {
@@ -124,13 +145,13 @@ void main() {
 
         //Clear the offscreen buffer with an opaque background
         Gdx.gl.glClearColor(0.7f, 0.3f, 0.7f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
         //before rendering, ensure we are using the default shader
         app.stg.batch.shader = null
 
         //resize the batch projection matrix before drawing with it
-        resizeBatch(FBO_SIZE, FBO_SIZE)
+        resizeBatch(app.width.toInt(), app.height.toInt())
 
         //now we can start drawing...
         app.stg.batch.begin()
@@ -191,11 +212,13 @@ void main() {
         //reset to default shader without blurs
         app.stg.batch.shader = null
 
-        //draw FPS
-        fps.draw(app.stg.batch, (Gdx.graphics.framesPerSecond).toString(), 5f, Gdx.graphics.height - 5f)
-
         //finally, end the batch since we have reached the end of the frame
         app.stg.batch.end()
+
+        // log the fps on screen
+        app.sb.begin()
+        font.draw(app.sb, Gdx.graphics.framesPerSecond.toString(), 0f, font.lineHeight)
+        app.sb.end()
     }
 
     override fun dispose() {

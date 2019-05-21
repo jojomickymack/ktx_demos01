@@ -2,11 +2,11 @@ package org.central.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Texture
 import ktx.app.KtxScreen
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import org.central.App
+import org.central.assets.Fonts
 import org.central.assets.Images.badlogic
 import org.central.assets.Images.slime
 import org.central.assets.Images.mask
@@ -129,7 +129,9 @@ void main(void) {
     private var mask = mask()
 
     lateinit var shader: ShaderProgram
-    lateinit var fps: BitmapFont
+
+    private val font = Fonts.SDS_6x6()
+
     var time = 0f
 
     override fun show() {
@@ -141,8 +143,6 @@ void main(void) {
         println("Vertex Shader:\n-------------\n\n$VERT")
         println("\n")
         println("Fragment Shader:\n-------------\n\n$FRAG2")
-
-        fps = BitmapFont()
 
         shader = ShaderProgram(VERT, FRAG2)
         if (!shader.isCompiled) {
@@ -167,17 +167,24 @@ void main(void) {
 
         // tex0 will be bound when we call SpriteBatch.draw
         app.stg.batch.shader = shader
+
+        font.data.setScale(app.fontSize)
     }
 
     override fun render(delta: Float) {
         time += Gdx.graphics.deltaTime
 
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
         app.stg.batch.begin()
         shader.setUniformf("time", time)
         app.stg.batch.draw(slime, 0f, 0f, app.width, app.height)
         app.stg.batch.end()
+
+        // log the fps on screen
+        app.sb.begin()
+        font.draw(app.sb, Gdx.graphics.framesPerSecond.toString(), 0f, font.lineHeight)
+        app.sb.end()
     }
 
     override fun dispose() {
