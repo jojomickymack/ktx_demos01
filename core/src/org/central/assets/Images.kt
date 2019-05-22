@@ -6,6 +6,7 @@ import ktx.assets.getAsset
 import ktx.assets.load
 
 enum class Images {
+    back_button,
     introBgTex,
     introLogoTex,
     titleBgTex,

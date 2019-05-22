@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Vector2
 import org.central.App
 import org.central.assets.Images.mountains
 import org.central.assets.Images.badlogic
-import org.central.assets.Fonts.SDS_6x6
 
 
 class Water(val app: App) : KtxScreen {
@@ -31,8 +30,6 @@ class Water(val app: App) : KtxScreen {
 
     private var time = 0f
 
-    private val font = SDS_6x6()
-
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         sceneFbo = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
@@ -42,7 +39,6 @@ class Water(val app: App) : KtxScreen {
     override fun show() {
         sceneFbo = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt(), app.height.toInt(), false)
         refractionFbo = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt() / downscaleFactor, app.height.toInt() / downscaleFactor, false)
-        font.data.setScale(app.fontSize)
     }
 
     override fun render(delta: Float) {
@@ -101,14 +97,10 @@ class Water(val app: App) : KtxScreen {
         app.sb.color = oldColor
         app.sb.shader = oldShader
 
-        // log the fps on screen
-        app.sb.begin()
-        font.draw(app.sb, Gdx.graphics.framesPerSecond.toString(), 0f, font.lineHeight)
-        app.sb.end()
+        app.drawFps()
     }
 
     override fun dispose() {
         refractionFbo.dispose()
-        font.dispose()
     }
 }

@@ -5,49 +5,19 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import ktx.app.KtxScreen
 import org.central.App
-import org.central.assets.Fonts
 import org.central.assets.Images.badlogic
 
 
 class Negative(val app: App) : KtxScreen {
 
-    val VERT = """
-attribute vec4 ${ShaderProgram.POSITION_ATTRIBUTE};
-attribute vec4 ${ShaderProgram.COLOR_ATTRIBUTE};
-attribute vec2 ${ShaderProgram.TEXCOORD_ATTRIBUTE}0;
-
-uniform mat4 u_projTrans;
-
-varying vec4 vColor;
-varying vec2 vTexCoord;
-
-void main() {
-    vColor = ${ShaderProgram.COLOR_ATTRIBUTE};
-    vTexCoord = ${ShaderProgram.TEXCOORD_ATTRIBUTE}0;
-    gl_Position = u_projTrans * ${ShaderProgram.POSITION_ATTRIBUTE};
-}"""
-
-    val FRAG = """
-varying vec4 vColor;
-varying vec2 vTexCoord;
-uniform sampler2D u_texture;
-
-void main() {
-	vec4 texColor = texture2D(u_texture, vTexCoord);
-	texColor.rgb = 1.0 - texColor.rgb;
-	gl_FragColor = texColor * vColor;
-}"""
-
     private val tex = badlogic()
     lateinit var shader: ShaderProgram
-
-    private val font = Fonts.SDS_6x6()
 
     override fun show() {
         // important since we aren't using some uniforms and attributes that SpriteBatch expects
         ShaderProgram.pedantic = false
 
-        shader = ShaderProgram(VERT, FRAG)
+        shader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/negative.frag"))
 
         if (!shader.isCompiled) {
             System.err.println(shader.log)
@@ -56,8 +26,6 @@ void main() {
         if (shader.log.isNotEmpty()) println(shader.log)
 
         app.stg.batch.shader = shader
-
-        font.data.setScale(app.fontSize)
     }
 
     override fun render(delta: Float) {
@@ -69,10 +37,7 @@ void main() {
             end()
         }
 
-        // log the fps on screen
-        app.sb.begin()
-        font.draw(app.sb, Gdx.graphics.framesPerSecond.toString(), 0f, font.lineHeight)
-        app.sb.end()
+        app.drawFps()
     }
 
     override fun dispose() {

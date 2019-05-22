@@ -18,7 +18,6 @@ import com.badlogic.gdx.utils.Array as GdxArray
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController
 import ktx.app.KtxScreen
 import org.central.App
-import org.central.assets.Fonts
 
 
 class ModelView(val app: App) : KtxScreen {
@@ -50,8 +49,6 @@ class ModelView(val app: App) : KtxScreen {
     var controllers = GdxArray<AnimationController>()
     var loading = false
 
-    private val font = Fonts.SDS_6x6()
-
     override fun show() {
 
         stgMb = ModelBatch()
@@ -77,14 +74,12 @@ class ModelView(val app: App) : KtxScreen {
         stgCam.update()
 
         camController = CameraInputController(stgCam)
-        Gdx.input.inputProcessor = camController
+        //Gdx.input.inputProcessor = camController
 
         assets = AssetManager()
         assets.load(modelString, Model::class.java)
 
         loading = true
-
-        font.data.setScale(app.fontSize)
     }
 
     private fun doneLoading() {
@@ -126,10 +121,7 @@ class ModelView(val app: App) : KtxScreen {
         stgMb.render(instances, environment)
         stgMb.end()
 
-        // log the fps on screen
-        app.sb.begin()
-        font.draw(app.sb, Gdx.graphics.framesPerSecond.toString(), 0f, font.lineHeight)
-        app.sb.end()
+        app.drawFps()
     }
 
     override fun dispose() {

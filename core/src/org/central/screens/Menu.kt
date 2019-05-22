@@ -23,12 +23,11 @@ class Menu(val app: App) : KtxScreen {
     }
 
     override fun show() {
+        app.hudStg.clear()
+        app.sb.shader = null
 
         val table = table {
             setFillParent(true)
-//            textButton("demo1") { onClick { app.setScreen<Demo1>() } }.cell(row = true)
-//            textButton("demo2") { onClick { app.setScreen<Demo2>() } }.cell(row = true)
-
             textButton("blur") { onClick { app.setScreen<Blur>() } }.cell(row = true)
             textButton("negative") { onClick { app.setScreen<Negative>() } }.cell(row = true)
             textButton("normals lighting") { onClick { app.setScreen<NormalsLighting>() } }.cell(row = true)
@@ -60,14 +59,13 @@ class Menu(val app: App) : KtxScreen {
         with(app) {
             stg.act(delta)
             stg.draw()
-
-            hudStg.act(delta)
-            hudStg.draw()
         }
     }
 
     override fun hide() {
         bgImage.clearActions()
         app.stg.clear()
+        app.hudStg.clear()
+        app.hudStg += app.backButton
     }
 }

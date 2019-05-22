@@ -4,18 +4,26 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.central.input.GamepadCtl
 import com.central.input.InputCtl
 import org.central.assets.*
+import org.central.assets.Fonts.SDS_6x6
+import org.central.assets.Images.back_button
 import org.central.assets.Tunes.*
 import org.central.screens.*
 import ktx.app.KtxGame
 import ktx.scene2d.Scene2DSkin
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import ktx.actors.plusAssign
 
 
 class App : KtxGame<Screen>() {
@@ -28,7 +36,11 @@ class App : KtxGame<Screen>() {
     var width = 0f
     var height = 0f
 
-    val fontSize = 5f
+    private lateinit var font: BitmapFont
+    private val fontSize = 5f
+
+    lateinit var backButton: Image
+    private val backButtonSize = 100f
 
     lateinit var sb: SpriteBatch
     private lateinit var hudSb: SpriteBatch
@@ -86,6 +98,14 @@ class App : KtxGame<Screen>() {
             this.fontManager.update()
         }
 
+        this.font = SDS_6x6()
+        this.font.data.setScale(this.fontSize)
+
+        this.backButton = Image(back_button())
+        this.backButton.x = this.hudCam.viewportWidth - backButtonSize
+        this.backButton.y = 0f
+        this.backButton.setSize(backButtonSize, backButtonSize)
+
         theme().volume = 0.5f
         theme().play()
 
@@ -94,8 +114,6 @@ class App : KtxGame<Screen>() {
         addScreen(Intro(this))
         addScreen(Title(this))
         //addScreen(Menu(this))
-        addScreen(Demo1(this))
-        addScreen(Demo2(this))
         addScreen(Stencil(this))
         addScreen(Negative(this))
         addScreen(Sepia(this))
@@ -108,6 +126,18 @@ class App : KtxGame<Screen>() {
 
         addScreen(intro)
         setScreen<Menu>()
+
+        backButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent, x: Float, y: Float) {
+                setScreen<Menu>()
+            }
+        })
+    }
+
+    override fun render() {
+        super.render()
+        this.hudStg.act()
+        this.hudStg.draw()
     }
 
     override fun dispose() {
@@ -129,5 +159,11 @@ class App : KtxGame<Screen>() {
         this.height = height.toFloat()
         this.cam.setToOrtho(false, this.width, this.height)
         this.stg.batch.projectionMatrix = this.cam.combined
+    }
+
+    fun drawFps() {
+        this.hudSb.begin()
+        this.font.draw(this.hudSb, Gdx.graphics.framesPerSecond.toString(), 0f, this.font.lineHeight)
+        this.hudSb.end()
     }
 }

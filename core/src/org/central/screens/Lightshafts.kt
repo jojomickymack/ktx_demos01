@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import org.central.App
 import org.central.assets.Images.small_window_wall
-import org.central.assets.Fonts.SDS_6x6
 
 
 class Lightshafts(val app: App) : KtxScreen {
@@ -18,8 +17,6 @@ class Lightshafts(val app: App) : KtxScreen {
 
     private lateinit var occludersFbo: FrameBuffer
     private lateinit var occlusionApprox: FrameBuffer
-
-    private val font = SDS_6x6()
 
     private val occlusionApproxShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/occlusion.frag"))
 
@@ -32,8 +29,6 @@ class Lightshafts(val app: App) : KtxScreen {
     override fun show() {
         occludersFbo = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt() / downscaleFactor, app.height.toInt() / downscaleFactor, false)
         occlusionApprox = FrameBuffer(Pixmap.Format.RGB888, app.width.toInt() / downscaleFactor, app.height.toInt() / downscaleFactor, false)
-
-        font.data.setScale(app.fontSize)
     }
 
     override fun render(delta: Float) {
@@ -74,10 +69,7 @@ class Lightshafts(val app: App) : KtxScreen {
         app.sb.draw(occlusionApprox.colorBufferTexture, 0f, 0f, app.width, app.height, 0f, 0f, 1f, 1f)
         app.sb.end()
 
-        // log the fps on screen
-        app.sb.begin()
-        font.draw(app.sb, Gdx.graphics.framesPerSecond.toString(), 0f, font.lineHeight)
-        app.sb.end()
+        app.drawFps()
     }
 
     override fun dispose() {

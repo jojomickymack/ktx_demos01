@@ -1,70 +1,20 @@
 package org.central.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.Texture.TextureFilter
 import ktx.app.KtxScreen
 import org.central.App
-import org.central.assets.Fonts
 import org.central.assets.Images.badlogic
 import org.central.assets.Images.funny_face
 
 
 class Blur(val app: App) : KtxScreen {
-
-    val VERT = """
-attribute vec4 ${ShaderProgram.POSITION_ATTRIBUTE};
-attribute vec4 ${ShaderProgram.COLOR_ATTRIBUTE};
-attribute vec2 ${ShaderProgram.TEXCOORD_ATTRIBUTE}0;
-
-uniform mat4 u_projTrans;
-varying vec4 vColor;
-varying vec2 vTexCoord;
-
-void main() {
-	vColor = ${ShaderProgram.COLOR_ATTRIBUTE};
-	vTexCoord = ${ShaderProgram.TEXCOORD_ATTRIBUTE}0;
-	gl_Position = u_projTrans * ${ShaderProgram.POSITION_ATTRIBUTE};
-}"""
-
-    val FRAG = """
-varying vec4 vColor;
-varying vec2 vTexCoord;
-
-uniform sampler2D u_texture;
-uniform float resolution;
-uniform float radius;
-uniform vec2 dir;
-
-void main() {
-	vec4 sum = vec4(0.0);
-	vec2 tc = vTexCoord;
-	float blur = radius/resolution;
-
-    float hstep = dir.x;
-    float vstep = dir.y;
-
-	sum += texture2D(u_texture, vec2(tc.x - 4.0*blur*hstep, tc.y - 4.0*blur*vstep)) * 0.05;
-	sum += texture2D(u_texture, vec2(tc.x - 3.0*blur*hstep, tc.y - 3.0*blur*vstep)) * 0.09;
-	sum += texture2D(u_texture, vec2(tc.x - 2.0*blur*hstep, tc.y - 2.0*blur*vstep)) * 0.12;
-	sum += texture2D(u_texture, vec2(tc.x - 1.0*blur*hstep, tc.y - 1.0*blur*vstep)) * 0.15;
-
-	sum += texture2D(u_texture, vec2(tc.x, tc.y)) * 0.16;
-
-	sum += texture2D(u_texture, vec2(tc.x + 1.0*blur*hstep, tc.y + 1.0*blur*vstep)) * 0.15;
-	sum += texture2D(u_texture, vec2(tc.x + 2.0*blur*hstep, tc.y + 2.0*blur*vstep)) * 0.12;
-	sum += texture2D(u_texture, vec2(tc.x + 3.0*blur*hstep, tc.y + 3.0*blur*vstep)) * 0.09;
-	sum += texture2D(u_texture, vec2(tc.x + 4.0*blur*hstep, tc.y + 4.0*blur*vstep)) * 0.05;
-
-	gl_FragColor = vColor * vec4(sum.rgb, 1.0);
-}"""
 
     private val tex1 = badlogic()
     private val tex2 = funny_face()
@@ -76,12 +26,10 @@ void main() {
 
     val MAX_BLUR = 2f
 
-    private val font = Fonts.SDS_6x6()
-
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
 
-        blurShader = ShaderProgram(VERT, FRAG)
+        blurShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/blur.frag"))
         if (!blurShader.isCompiled) {
             System.err.println(blurShader.log)
             System.exit(0)
@@ -107,7 +55,7 @@ void main() {
         // important since we aren't using some uniforms and attributes that SpriteBatch expects
         ShaderProgram.pedantic = false
 
-        blurShader = ShaderProgram(VERT, FRAG)
+        blurShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/blur.frag"))
         if (!blurShader.isCompiled) {
             System.err.println(blurShader.log)
             System.exit(0)
@@ -125,8 +73,6 @@ void main() {
         blurTargetB = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt(), app.height.toInt(), false)
         fboRegion = TextureRegion(blurTargetA.colorBufferTexture)
         fboRegion.flip(false, true)
-
-        font.data.setScale(app.fontSize)
     }
 
     private fun renderEntities(batch: SpriteBatch) {
@@ -215,10 +161,7 @@ void main() {
         //finally, end the batch since we have reached the end of the frame
         app.stg.batch.end()
 
-        // log the fps on screen
-        app.sb.begin()
-        font.draw(app.sb, Gdx.graphics.framesPerSecond.toString(), 0f, font.lineHeight)
-        app.sb.end()
+        app.drawFps()
     }
 
     override fun dispose() {
