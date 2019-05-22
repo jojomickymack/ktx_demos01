@@ -1,5 +1,7 @@
 # Ktx Demos
 
+![demos.gif](.github/demos.gif?raw=true)
+
 This is a 'grab-bag of demos' - basically just a place for me to dump a single screen demo or experiment as I tinker around with opengl shader 
 techniques and various libgdx/ktx features.
 
