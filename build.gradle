@@ -42,7 +42,7 @@ project(':desktop') {
     apply plugin: 'application'
 }
 
-project(':android') {
+project(':app') {
     apply plugin: 'android'
     apply plugin: 'kotlin-android'
 
@@ -50,7 +50,21 @@ project(':android') {
 
     dependencies {
         implementation project(':core')
+        implementation fileTree(dir: 'libs', include: ['*.jar'])
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+        implementation 'com.android.support:appcompat-v7:28.0.0'
+        implementation 'com.android.support:support-v4:28.0.0'
+        implementation 'com.android.support:recyclerview-v7:28.0.0'
+        implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+        implementation 'com.android.support:design:28.0.0'
+
+        // not sure if I really need this test stuff for android
+        testImplementation 'junit:junit:4.12'
+        androidTestImplementation 'com.android.support.test:runner:1.0.2'
+        androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
         implementation "io.github.libktx:ktx-app:$ktxVersion"
+        implementation "io.github.libktx:ktx-graphics:$ktxVersion"
         implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"

@@ -7,6 +7,6 @@ object DesktopLauncher {
     @JvmStatic
     fun main(args: Array<String>) {
         val config = LwjglApplicationConfiguration()
-        LwjglApplication(App(), config)
+        LwjglApplication(App("menu"), config)
     }
 }

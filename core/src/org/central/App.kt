@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -23,10 +22,9 @@ import org.central.screens.*
 import ktx.app.KtxGame
 import ktx.scene2d.Scene2DSkin
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import ktx.actors.plusAssign
 
 
-class App : KtxGame<Screen>() {
+class App(val gameChoice: String) : KtxGame<Screen>() {
 
     val textureManager = AssetManager()
     val soundManager = AssetManager()
@@ -106,14 +104,8 @@ class App : KtxGame<Screen>() {
         this.backButton.y = 0f
         this.backButton.setSize(backButtonSize, backButtonSize)
 
-        theme().volume = 0.5f
-        theme().play()
+        addScreen(Menu(this))
 
-        val intro = Menu(this)
-
-        addScreen(Intro(this))
-        addScreen(Title(this))
-        //addScreen(Menu(this))
         addScreen(Stencil(this))
         addScreen(Negative(this))
         addScreen(Sepia(this))
@@ -124,8 +116,19 @@ class App : KtxGame<Screen>() {
         addScreen(Lightshafts(this))
         addScreen(Water(this))
 
-        addScreen(intro)
-        setScreen<Menu>()
+        when (gameChoice) {
+            "menu" -> setScreen<Menu>()
+            "negative" -> setScreen<Negative>()
+            "stencil" -> setScreen<Stencil>()
+            "sepia" -> setScreen<Sepia>()
+            "simplex" -> setScreen<SimplexNoise>()
+            "blur" -> setScreen<Blur>()
+            "normals" -> setScreen<NormalsLighting>()
+            "models" -> setScreen<ModelView>()
+            "lightshafts" -> setScreen<Lightshafts>()
+            "water" -> setScreen<Water>()
+            else -> setScreen<Menu>()
+        }
 
         backButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent, x: Float, y: Float) {
