@@ -3,7 +3,7 @@ atlasData: {
 	atlasCurrent: true
 	drawables: [
 		{
-			file: C:/projects/github/ktx_demos01/android/assets/custom/raw/carbontype.png
+			file: C:/projects/github/ktx_demos01/app/assets/custom/raw/carbontype.png
 			bgColor: {
 				r: 0
 				g: 0
@@ -20,7 +20,7 @@ atlasData: {
 			customized: false
 		}
 		{
-			file: C:/projects/github/ktx_demos01/android/assets/custom/raw/window-white-bg.9.png
+			file: C:/projects/github/ktx_demos01/app/assets/custom/raw/window-white-bg.9.png
 			bgColor: {
 				r: 0
 				g: 0
@@ -37,7 +37,7 @@ atlasData: {
 			customized: false
 		}
 		{
-			file: C:/projects/github/ktx_demos01/android/assets/custom/raw/window-black-bg.9.png
+			file: C:/projects/github/ktx_demos01/app/assets/custom/raw/window-black-bg.9.png
 			bgColor: {
 				r: 1
 				g: 1
@@ -54,7 +54,7 @@ atlasData: {
 			customized: false
 		}
 		{
-			file: C:/projects/github/ktx_demos01/android/assets/custom/raw/white.png
+			file: C:/projects/github/ktx_demos01/app/assets/custom/raw/white.png
 			bgColor: {
 				r: 0
 				g: 0
@@ -109,7 +109,7 @@ jsonData: {
 		{
 			class: com.ray3k.skincomposer.data.FontData
 			name: carbontype
-			file: C:/projects/github/ktx_demos01/android/assets/custom/raw/carbontype.fnt
+			file: C:/projects/github/ktx_demos01/app/assets/custom/raw/carbontype.fnt
 		}
 	]
 	freeTypeFonts: []
@@ -868,7 +868,7 @@ jsonData: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: selection
 						optional: false
-						value: white
+						value: null
 					}
 					down: {
 						class: com.ray3k.skincomposer.data.StyleProperty
@@ -1381,7 +1381,7 @@ jsonData: {
 						type: com.badlogic.gdx.graphics.Color
 						name: overFontColor
 						optional: true
-						value: null
+						value: red
 					}
 					checkedFontColor: {
 						class: com.ray3k.skincomposer.data.StyleProperty
@@ -1423,7 +1423,7 @@ jsonData: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: over
 						optional: true
-						value: window-white-bg
+						value: null
 					}
 					focused: {
 						class: com.ray3k.skincomposer.data.StyleProperty
@@ -1791,5 +1791,5 @@ preferences: {
 		value: false
 	}
 }
-saveFile: C:/projects/github/ktx_demos01/android/assets/custom/skin-composer.scmp
+saveFile: C:/projects/github/ktx_demos01/app/assets/custom/skin-composer.scmp
 }

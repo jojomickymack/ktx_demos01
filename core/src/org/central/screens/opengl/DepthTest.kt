@@ -1,21 +1,45 @@
-package org.central.screens
+package org.central.screens.opengl
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import ktx.actors.onClick
+import ktx.actors.plusAssign
 import ktx.app.KtxScreen
+import ktx.scene2d.table
+import ktx.scene2d.textButton
 import org.central.App
 import org.central.assets.Images.badlogic
 
 
-class Stencil(val app: App) : KtxScreen {
+class DepthTest(val app: App) : KtxScreen {
 
     private val tex = badlogic()
     private val sr = ShapeRenderer()
     private var rotation = 1f
+    private var depthTestEqual = true
+    private lateinit var myButton: TextButton
+
+    override fun show() {
+        super.show()
+
+        val buttonTable = table {
+            myButton = textButton("test on/off") { onClick { depthTestEqual = !depthTestEqual } }
+        }
+
+        buttonTable.setPosition(app.hudStg.width / 2, app.hudStg.height / 2)
+
+        app.hudStg += buttonTable
+        Gdx.input.inputProcessor = app.hudStg
+    }
 
     override fun render(delta: Float) {
         rotation += 1f
+
+        // the text is hard to see when the background image is displayed
+        myButton.label.color = if (depthTestEqual) Color.WHITE else Color.BLACK
 
         //1. clear screen
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
@@ -50,24 +74,26 @@ class Stencil(val app: App) : KtxScreen {
         }
 
         ///////////// Draw sprite(s) to be masked
-        app.stg.batch.begin()
-
-        // 8. Enable RGBA color writing
-        //   (SpriteBatch.begin() will disable depth mask)
-        Gdx.gl.glColorMask(true, true, true, true)
-
-        // 9. Make sure testing is enabled.
-        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
-
-        // 10. Now depth discards pixels outside our masked shapes
-        Gdx.gl.glDepthFunc(GL20.GL_EQUAL)
-
         with(app.stg.batch) {
+            begin()
+
+            // 8. Enable RGBA color writing
+            //   (SpriteBatch.begin() will disable depth mask)
+            Gdx.gl.glColorMask(true, true, true, true)
+
+            // 9. Make sure testing is enabled.
+            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
+
+            // 10. Now depth discards pixels outside our masked shapes if the
+            if (depthTestEqual) Gdx.gl.glDepthFunc(GL20.GL_EQUAL) else Gdx.gl.glDepthFunc(GL20.GL_ALWAYS)
+
             draw(tex, 0f, 0f, app.width, app.height)
             end()
         }
 
+        // disable the funky stuff so things can be drawn normally
         Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST)
+        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST)
 
         app.drawFps()
     }

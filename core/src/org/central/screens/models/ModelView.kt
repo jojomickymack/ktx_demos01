@@ -1,4 +1,4 @@
-package org.central.screens
+package org.central.screens.models
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
@@ -74,7 +74,7 @@ class ModelView(val app: App) : KtxScreen {
         stgCam.update()
 
         camController = CameraInputController(stgCam)
-        //Gdx.input.inputProcessor = camController
+        Gdx.input.inputProcessor = camController
 
         assets = AssetManager()
         assets.load(modelString, Model::class.java)

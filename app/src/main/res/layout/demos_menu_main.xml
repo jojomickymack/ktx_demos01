@@ -4,8 +4,8 @@
                                              android:layout_height="match_parent">
 
     <android.support.v7.widget.Toolbar
-            android:id="@+id/search_results_toolbar"
-            app:title="search results"
+            android:id="@+id/demos_menu_toolbar"
+            app:title="demos"
             app:titleTextColor="@color/lightTitleItems"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -14,20 +14,19 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/search_results_frame_layout"/>
+            app:layout_constraintBottom_toTopOf="@+id/demos_menu_frame_layout"/>
     <FrameLayout
-            android:id="@+id/search_results_frame_layout"
+            android:id="@+id/demos_menu_frame_layout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/search_results_toolbar">
-        <android.support.v7.widget.RecyclerView android:id="@+id/search_results_item_list"
+            app:layout_constraintTop_toBottomOf="@+id/demos_menu_toolbar">
+        <android.support.v7.widget.RecyclerView android:id="@+id/demos_menu_item_list"
                                                 android:layout_width="match_parent"
                                                 android:layout_height="match_parent"
                                                 app:layoutManager="LinearLayoutManager"
-                                                tools:context=".pages.searchSystem.SearchResults"
-                                                tools:listitem="@layout/search_results_content"
+                                                tools:listitem="@layout/demos_menu_content"
                                                 android:scrollbars="vertical"
                                                 android:background="@color/listBackground"/>
     </FrameLayout>

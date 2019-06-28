@@ -1,13 +1,11 @@
 package org.central.gdxmenu.app.pages
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-
 import org.central.gdxmenu.app.R
 
 
@@ -21,7 +19,7 @@ class Splash : Fragment() {
         menuButton .setOnClickListener { v ->
             fragmentManager!!.beginTransaction()
                 .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
-                .replace(R.id.parent_container, DemosMenu())
+                .replace(R.id.parent_container, DemosMainMenu())
                 .addToBackStack("Loading")
                 .commit()
         }

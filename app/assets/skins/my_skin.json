@@ -34,19 +34,11 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 		fontColor: white
 	}
 }
-com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
-	default: {
-		font: carbontype
-		fontColorSelected: red
-		fontColorUnselected: white
-		selection: white
-	}
-}
 com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 	default: {
 		font: carbontype
 		fontColor: white
-		over: window-white-bg
+		overFontColor: red
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {

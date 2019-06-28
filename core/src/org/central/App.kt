@@ -9,19 +9,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.central.input.GamepadCtl
 import com.central.input.InputCtl
 import org.central.assets.*
 import org.central.assets.Fonts.SDS_6x6
-import org.central.assets.Images.back_button
-import org.central.assets.Tunes.*
-import org.central.screens.*
 import ktx.app.KtxGame
 import ktx.scene2d.Scene2DSkin
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import org.central.screens.Menu
+import org.central.screens.models.ModelView
+import org.central.screens.opengl.DepthTest
+import org.central.screens.shaders.*
 
 
 class App(val gameChoice: String) : KtxGame<Screen>() {
@@ -36,9 +34,6 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
 
     private lateinit var font: BitmapFont
     private val fontSize = 5f
-
-    lateinit var backButton: Image
-    private val backButtonSize = 100f
 
     lateinit var sb: SpriteBatch
     private lateinit var hudSb: SpriteBatch
@@ -65,18 +60,21 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         Tunes.manager = this.tuneManager
         Fonts.manager = this.fontManager
 
-        this.width = Gdx.graphics.height.toFloat()
-        this.height = Gdx.graphics.width.toFloat()
+        this.height = Gdx.graphics.height.toFloat()
+        this.width = Gdx.graphics.width.toFloat()
 
         this.sb = SpriteBatch()
         this.hudSb = SpriteBatch()
 
+        val stretchWidth = 360f
+        val stretchHeight = 785f
+
         this.cam = OrthographicCamera(this.width, this.height)
-        this.view = StretchViewport(480f, 360f, this.cam)
+        this.view = StretchViewport(stretchWidth, stretchHeight, this.cam)
         this.stg = Stage(this.view, this.sb)
 
         this.hudCam = OrthographicCamera(this.width, this.height)
-        this.hudView = StretchViewport(480f, 360f, this.hudCam)
+        this.hudView = StretchViewport(stretchWidth, stretchHeight, this.hudCam)
         this.hudStg = Stage(this.hudView , this.hudSb)
 
         sr = ShapeRenderer()
@@ -99,14 +97,9 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         this.font = SDS_6x6()
         this.font.data.setScale(this.fontSize)
 
-        this.backButton = Image(back_button())
-        this.backButton.x = this.hudCam.viewportWidth - backButtonSize
-        this.backButton.y = 0f
-        this.backButton.setSize(backButtonSize, backButtonSize)
-
         addScreen(Menu(this))
 
-        addScreen(Stencil(this))
+        addScreen(DepthTest(this))
         addScreen(Negative(this))
         addScreen(Sepia(this))
         addScreen(SimplexNoise(this))
@@ -119,7 +112,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         when (gameChoice) {
             "menu" -> setScreen<Menu>()
             "negative" -> setScreen<Negative>()
-            "stencil" -> setScreen<Stencil>()
+            "depthtest" -> setScreen<DepthTest>()
             "sepia" -> setScreen<Sepia>()
             "simplex" -> setScreen<SimplexNoise>()
             "blur" -> setScreen<Blur>()
@@ -129,16 +122,12 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "water" -> setScreen<Water>()
             else -> setScreen<Menu>()
         }
-
-        backButton.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent, x: Float, y: Float) {
-                setScreen<Menu>()
-            }
-        })
     }
 
     override fun render() {
         super.render()
+        this.stg.act()
+        this.stg.draw()
         this.hudStg.act()
         this.hudStg.draw()
     }

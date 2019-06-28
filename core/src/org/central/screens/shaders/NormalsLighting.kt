@@ -1,4 +1,4 @@
-package org.central.screens
+package org.central.screens.shaders
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
