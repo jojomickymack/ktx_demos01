@@ -31,7 +31,7 @@ class TriangleDemo(val app: App) : KtxScreen {
             VertexAttribute(Usage.Position, POSITION_COMPONENTS, "a_position"),
             VertexAttribute(Usage.ColorUnpacked, COLOR_COMPONENTS, "a_color"))
 
-    var shader = ShaderProgram(Gdx.files.internal("shaders/default2.vert"), Gdx.files.internal("shaders/red.frag"))
+    var shader = ShaderProgram(Gdx.files.internal("shaders/default2.vert"), Gdx.files.internal("shaders/passthrough.frag"))
 
     val red = Color.RED
     val green = Color.GREEN

@@ -19,7 +19,7 @@ class NormalsLighting(val app: App) : KtxScreen {
     lateinit var shader: ShaderProgram
 
     // our constants...
-    val DEFAULT_LIGHT_Z = 0.075f
+    val DEFAULT_LIGHT_Z = 0.07f
     val AMBIENT_INTENSITY = 0.8f
     val LIGHT_INTENSITY = 1f
 
@@ -33,6 +33,9 @@ class NormalsLighting(val app: App) : KtxScreen {
 
     // Attenuation coefficients for light falloff
     val FALLOFF = Vector3(.4f, 3f, 20f)
+
+    val lightZVals = floatArrayOf(0.00f, 0.05f, 0.1f, 0.15f, 0.2f, 0.25f, 0.3f)
+    var lightZIndex = 0
 
     override fun show() {
         ShaderProgram.pedantic = false
@@ -66,8 +69,10 @@ class NormalsLighting(val app: App) : KtxScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
         //reset light Z
-        if (Gdx.input.isTouched) {
-            LIGHT_POS.z = DEFAULT_LIGHT_Z
+        if (Gdx.input.justTouched()) {
+            lightZIndex++
+            if (lightZIndex >= lightZVals.size) lightZIndex = 0
+            LIGHT_POS.z = lightZVals[lightZIndex]
             System.out.println("New light Z: " + LIGHT_POS.z)
         }
 
@@ -77,7 +82,7 @@ class NormalsLighting(val app: App) : KtxScreen {
 
         //update light position, normalized to screen resolution
         val x = Gdx.input.x / app.width
-        val y = Gdx.input.y / app.height
+        val y = 1 - Gdx.input.y / app.height
 
         LIGHT_POS.x = x
         LIGHT_POS.y = y
