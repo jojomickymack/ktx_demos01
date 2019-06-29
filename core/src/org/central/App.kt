@@ -17,8 +17,9 @@ import org.central.assets.Fonts.SDS_6x6
 import ktx.app.KtxGame
 import ktx.scene2d.Scene2DSkin
 import org.central.screens.Menu
-import org.central.screens.models.ModelView
-import org.central.screens.opengl.DepthTest
+import org.central.screens.models.*
+import org.central.screens.opengl.*
+import org.central.screens.physics.SimpleGravity
 import org.central.screens.shaders.*
 
 
@@ -100,6 +101,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         addScreen(Menu(this))
 
         addScreen(DepthTest(this))
+        addScreen(TriangleDemo(this))
         addScreen(Negative(this))
         addScreen(Sepia(this))
         addScreen(SimplexNoise(this))
@@ -108,11 +110,13 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         addScreen(ModelView(this))
         addScreen(Lightshafts(this))
         addScreen(Water(this))
+        addScreen(SimpleGravity(this))
 
         when (gameChoice) {
             "menu" -> setScreen<Menu>()
             "negative" -> setScreen<Negative>()
             "depthtest" -> setScreen<DepthTest>()
+            "triangle" -> setScreen<TriangleDemo>()
             "sepia" -> setScreen<Sepia>()
             "simplex" -> setScreen<SimplexNoise>()
             "blur" -> setScreen<Blur>()
@@ -120,6 +124,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "models" -> setScreen<ModelView>()
             "lightshafts" -> setScreen<Lightshafts>()
             "water" -> setScreen<Water>()
+            "gravity" -> setScreen<SimpleGravity>()
             else -> setScreen<Menu>()
         }
     }
@@ -143,7 +148,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         this.stg.dispose()
         this.hudStg.dispose()
 
-        super.dispose()
+//        super.dispose()
     }
 
     override fun resize(width: Int, height: Int) {

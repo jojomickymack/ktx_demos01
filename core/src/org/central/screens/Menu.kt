@@ -2,7 +2,6 @@ package org.central.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.scenes.scene2d.actions.Actions.*
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import ktx.actors.plusAssign
 import ktx.app.KtxScreen
@@ -13,6 +12,8 @@ import ktx.scene2d.table
 import ktx.scene2d.textButton
 import org.central.screens.models.ModelView
 import org.central.screens.opengl.DepthTest
+import org.central.screens.opengl.TriangleDemo
+import org.central.screens.physics.SimpleGravity
 import org.central.screens.shaders.*
 
 
@@ -33,11 +34,13 @@ class Menu(val app: App) : KtxScreen {
         val table = table {
             setFillParent(true)
             textButton("blur") { onClick { app.setScreen<Blur>() } }.cell(row = true)
+            textButton("gravity") { onClick { app.setScreen<SimpleGravity>() } }.cell(row = true)
             textButton("negative") { onClick { app.setScreen<Negative>() } }.cell(row = true)
             textButton("normals lighting") { onClick { app.setScreen<NormalsLighting>() } }.cell(row = true)
             textButton("sepia") { onClick { app.setScreen<Sepia>() } }.cell(row = true)
             textButton("simplex noise") { onClick { app.setScreen<SimplexNoise>() } }.cell(row = true)
-            textButton("stencil") { onClick { app.setScreen<DepthTest>() } }.cell(row = true)
+            textButton("depth test") { onClick { app.setScreen<DepthTest>() } }.cell(row = true)
+            textButton("triangle") { onClick { app.setScreen<TriangleDemo>() } }.cell(row = true)
             textButton("model view") { onClick { app.setScreen<ModelView>() } }.cell(row = true)
             textButton("lightshafts") { onClick { app.setScreen<Lightshafts>() } }.cell(row = true)
             textButton("water") { onClick { app.setScreen<Water>() } }.cell(row = true)

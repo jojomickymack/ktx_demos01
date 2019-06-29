@@ -19,8 +19,8 @@ class DemosMenuByType : Fragment() {
     lateinit var demosMenuByTypeFragment: DemosMenuByType
     lateinit var itemList: RecyclerView
     var modelDemosList = mutableListOf("models")
-    var openglDemosList = mutableListOf("depthtest")
-    var physicsDemosList = mutableListOf("box2d")
+    var openglDemosList = mutableListOf("triangle", "depthtest")
+    var physicsDemosList = mutableListOf("gravity")
     var shadersDemosList = mutableListOf("negative", "sepia", "simplex", "blur", "normals", "lightshafts", "water")
 
     lateinit var adapter: MainDemosByTypeAdaptor
