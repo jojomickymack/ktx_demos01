@@ -11,17 +11,25 @@ import org.central.App
 import ktx.app.KtxInputAdapter
 import ktx.box2d.body
 
+/**
+ *     in order for the world to work right (units in the box2d world are in meters, not pixels), the screen needs
+ * to be scaled down to avoid resorting to large sizes and speeds.
+ *     this presents a problem reconciling the difference in dimensions of the desktop/android launchers. When the
+ * camera is zoomed in on android, everything lines up. When the camera is not zoomed in on desktop, everything lines up.
+ */
 
 class SimpleGravity(val app: App) : KtxScreen {
 
     val debugRenderer = Box2DDebugRenderer()
     val world = createWorld(gravity = Vector2(0f, -20f))
     val scaleDown = 0.25f
+    val scaledWidth = app.width * scaleDown
+    val scaledHeight = app.height * scaleDown
 
     fun createBody(x: Float, y: Float) {
         var body = world.body {
             type = BodyType.DynamicBody
-            position.set(Vector2(x, app.height - y))
+            position.set(Vector2(x, scaledHeight - y))
             box(width = 20f, height = 20f) {
                 density = 20f
                 restitution = 0.0f
@@ -30,17 +38,20 @@ class SimpleGravity(val app: App) : KtxScreen {
     }
 
     override fun show() {
-        app.width = app.width * scaleDown
-        app.height = app.height * scaleDown
+        app.cam.viewportWidth = scaledWidth
+        app.cam.viewportHeight = scaledHeight
+        app.cam.position.x = 0f + scaledWidth / 2
+        app.cam.position.y = 0f + scaledHeight / 2
+
+        // comment out the camera zoom when running on desktop
         app.cam.zoom = scaleDown
-        app.cam.position.x = 0f + app.width / 2
-        app.cam.position.y = 0f + app.height / 2
         Gdx.input.inputProcessor = InputMultiplexer(inputProcessor, app.hudStg)
 
         var ground = world.body {
             type = BodyType.StaticBody
-            position.set(Vector2(app.width / 2, 10f))
-            box(app.width, 10f)
+            position.x = scaledWidth / 2
+            position.y = 10f
+            box(scaledWidth - 20f, 10f)
         }
     }
 
