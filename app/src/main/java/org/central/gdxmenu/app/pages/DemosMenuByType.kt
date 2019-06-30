@@ -21,7 +21,7 @@ class DemosMenuByType : Fragment() {
     var modelDemosList = mutableListOf("models")
     var openglDemosList = mutableListOf("triangle", "depthtest")
     var physicsDemosList = mutableListOf("gravity")
-    var shadersDemosList = mutableListOf("negative", "sepia", "simplex", "blur", "normals", "lightshafts", "water")
+    var shadersDemosList = mutableListOf("negative", "sepia", "vignette", "simplex", "blur", "normals", "lightshafts", "water")
 
     lateinit var adapter: MainDemosByTypeAdaptor
     var chosenType = ""

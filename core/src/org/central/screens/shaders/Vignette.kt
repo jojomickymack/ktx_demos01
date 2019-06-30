@@ -10,24 +10,24 @@ import org.central.assets.Images.badlogic
 import kotlin.system.exitProcess
 
 
-class Sepia(val app: App) : KtxScreen {
+class Vignette(val app: App) : KtxScreen {
 
     private val tex = badlogic()
-    private lateinit var sepiaShader: ShaderProgram
+    private lateinit var vignetteShader: ShaderProgram
 
     private fun initializeDimensions(width: Int, height: Int) {
         // important since we aren't using some uniforms and attributes that SpriteBatch expects
         ShaderProgram.pedantic = false
 
-        sepiaShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/sepia.frag"))
-        if (!sepiaShader.isCompiled) throw GdxRuntimeException("Could not compile shader: ${sepiaShader.log}")
+        vignetteShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/vignette.frag"))
+        if (!vignetteShader.isCompiled) throw GdxRuntimeException("Could not compile shader: ${vignetteShader.log}")
 
         // bind the shader, then set the uniform, then unbind the shader
-        sepiaShader.begin()
-        sepiaShader.setUniformf("resolution", width.toFloat(), height.toFloat())
-        sepiaShader.end()
+        vignetteShader.begin()
+        vignetteShader.setUniformf("resolution", width.toFloat(), height.toFloat())
+        vignetteShader.end()
 
-        app.stg.batch.shader = sepiaShader
+        app.stg.batch.shader = vignetteShader
     }
 
     override fun resize(width: Int, height: Int) {
@@ -52,6 +52,6 @@ class Sepia(val app: App) : KtxScreen {
     }
 
     override fun dispose() {
-        sepiaShader.dispose()
+        vignetteShader.dispose()
     }
 }

@@ -3,29 +3,26 @@ package org.central.screens.shaders
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.utils.GdxRuntimeException
 import ktx.app.KtxScreen
 import org.central.App
 import org.central.assets.Images.badlogic
+import kotlin.system.exitProcess
 
 
 class Negative(val app: App) : KtxScreen {
 
     private val tex = badlogic()
-    lateinit var shader: ShaderProgram
+    private lateinit var negativeShader: ShaderProgram
 
     override fun show() {
         // important since we aren't using some uniforms and attributes that SpriteBatch expects
         ShaderProgram.pedantic = false
 
-        shader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/negative.frag"))
+        negativeShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/negative.frag"))
+        if (!negativeShader.isCompiled) throw GdxRuntimeException("Could not compile shader: ${negativeShader.log}")
 
-        if (!shader.isCompiled) {
-            System.err.println(shader.log)
-            System.exit(0)
-        }
-        if (shader.log.isNotEmpty()) println(shader.log)
-
-        app.stg.batch.shader = shader
+        app.stg.batch.shader = negativeShader
     }
 
     override fun render(delta: Float) {
@@ -41,6 +38,6 @@ class Negative(val app: App) : KtxScreen {
     }
 
     override fun dispose() {
-        shader.dispose()
+        negativeShader.dispose()
     }
 }

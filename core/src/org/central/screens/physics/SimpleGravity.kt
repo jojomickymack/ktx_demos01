@@ -20,11 +20,11 @@ import ktx.box2d.body
 
 class SimpleGravity(val app: App) : KtxScreen {
 
-    val debugRenderer = Box2DDebugRenderer()
-    val world = createWorld(gravity = Vector2(0f, -20f))
-    val scaleDown = 0.25f
-    val scaledWidth = app.width * scaleDown
-    val scaledHeight = app.height * scaleDown
+    private val debugRenderer = Box2DDebugRenderer()
+    private val world = createWorld(gravity = Vector2(0f, -20f))
+    private val scaleDown = 0.25f
+    private val scaledWidth = app.width * scaleDown
+    private val scaledHeight = app.height * scaleDown
 
     fun createBody(x: Float, y: Float) {
         var body = world.body {
@@ -60,18 +60,14 @@ class SimpleGravity(val app: App) : KtxScreen {
         debugRenderer.render(world, app.cam.combined)
     }
 
-    override fun hide() {
-
-    }
-
-    override fun dispose() {
-        world.dispose()
-    }
-
     private val inputProcessor = object : KtxInputAdapter {
         override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
             createBody(screenX * scaleDown, screenY * scaleDown)
             return false
         }
+    }
+
+    override fun dispose() {
+        world.dispose()
     }
 }

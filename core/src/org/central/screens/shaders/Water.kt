@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.GdxRuntimeException
 import org.central.App
 import org.central.assets.Images.mountains
 import org.central.assets.Images.badlogic
@@ -26,27 +27,36 @@ class Water(val app: App) : KtxScreen {
     private lateinit var sceneFbo: FrameBuffer
     private lateinit var refractionFbo: FrameBuffer
 
-    private val waterShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/water.frag"))
+    private lateinit var waterShader: ShaderProgram
 
     private var time = 0f
+    private val sceneRatio = 0.6f
 
-    override fun resize(width: Int, height: Int) {
-        super.resize(width, height)
+    private fun initializeDimensions(width: Int, height: Int) {
+        waterShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/water.frag"))
+        if (!waterShader.isCompiled) throw GdxRuntimeException("Could not compile shader: ${waterShader.log}")
+
         sceneFbo = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
         refractionFbo = FrameBuffer(Pixmap.Format.RGBA8888, width / downscaleFactor, height / downscaleFactor, false)
     }
 
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        initializeDimensions(width, height)
+    }
+
     override fun show() {
-        sceneFbo = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt(), app.height.toInt(), false)
-        refractionFbo = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt() / downscaleFactor, app.height.toInt() / downscaleFactor, false)
+        initializeDimensions(app.width.toInt(), app.height.toInt())
     }
 
     override fun render(delta: Float) {
         time += delta
 
         // move the gdx logo to the pos of the mouse
-        mouseCoords.x = Gdx.input.x.toFloat() - badlogic.width / 2
-        mouseCoords.y = (Gdx.input.y.toFloat() * 2f) - badlogic.height / 2
+        mouseCoords.x = Gdx.input.x.toFloat()
+        mouseCoords.y = Gdx.input.y.toFloat() * (app.height / (app.height * sceneRatio))
+
+        app.sb.color = Color(1f, 1f, 1f, 1f)
 
         sceneFbo.begin()
         app.sb.begin()
@@ -54,7 +64,7 @@ class Water(val app: App) : KtxScreen {
         // this is the framebuffer for the scene - whatever is here is reflected in the water
 
         app.sb.draw(mountains, 0f, 0f, app.width, app.height, 0, 0, mountains.width, mountains.height, false, true)
-        app.sb.draw(badlogic, mouseCoords.x, mouseCoords.y, badlogic.width.toFloat(), badlogic.height.toFloat(), 0, 0, badlogic.width, badlogic.height, false, true)
+        app.sb.draw(badlogic, mouseCoords.x - badlogic.width / 2, mouseCoords.y - badlogic.height / 2, badlogic.width.toFloat(), badlogic.height.toFloat(), 0, 0, badlogic.width, badlogic.height, false, true)
         app.sb.end()
 
         sceneFbo.end()
@@ -62,7 +72,7 @@ class Water(val app: App) : KtxScreen {
         // draws the top part of the screen
 
         app.sb.begin()
-        app.sb.draw(sceneFbo.colorBufferTexture, 0f, app.height * 0.3f, app.width, app.height * 0.7f)
+        app.sb.draw(sceneFbo.colorBufferTexture, 0f, app.height * (1 - sceneRatio), app.width, app.height * sceneRatio)
         app.sb.end()
 
         // draws the reflection of the water into another framebuffer
@@ -80,7 +90,6 @@ class Water(val app: App) : KtxScreen {
 
         // renders the water
         val oldShader = app.sb.shader
-        val oldColor = app.sb.color
         app.sb.shader = waterShader
 
         app.sb.begin()
@@ -90,17 +99,18 @@ class Water(val app: App) : KtxScreen {
         waterShader.setUniformi("u_displacement", 1)
 
         app.sb.color = Color(0.3f, 0.7f, 1f, 1f)
-        app.sb.draw(refractionFbo.colorBufferTexture, 0f, 0f, app.width, app.height * 0.3f, 0, 20, refractionFbo.colorBufferTexture.width, refractionFbo.colorBufferTexture.height, false, false)
+        app.sb.draw(refractionFbo.colorBufferTexture, 0f, 0f, app.width, app.height * (1 - sceneRatio), 0, 20, refractionFbo.colorBufferTexture.width, refractionFbo.colorBufferTexture.height, false, false)
 
         app.sb.end()
 
-        app.sb.color = oldColor
         app.sb.shader = oldShader
 
         app.drawFps()
     }
 
     override fun dispose() {
+        sceneFbo.dispose()
         refractionFbo.dispose()
+        waterShader.dispose()
     }
 }

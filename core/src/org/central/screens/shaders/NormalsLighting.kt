@@ -16,53 +16,58 @@ class NormalsLighting(val app: App) : KtxScreen {
     private val rock = rock()
     private val rockNormals = rock_n()
 
-    lateinit var shader: ShaderProgram
-
     // our constants...
-    val DEFAULT_LIGHT_Z = 0.07f
-    val AMBIENT_INTENSITY = 0.8f
-    val LIGHT_INTENSITY = 1f
+    private val DEFAULT_LIGHT_Z = 0.07f
+    private val AMBIENT_INTENSITY = 0.8f
+    private val LIGHT_INTENSITY = 1f
 
-    val LIGHT_POS = Vector3(0f, 0f, DEFAULT_LIGHT_Z)
+    private val LIGHT_POS = Vector3(0f, 0f, DEFAULT_LIGHT_Z)
 
     // Light RGB and intensity (alpha)
-    val LIGHT_COLOR = Vector3(1f, 0.8f, 0.6f)
+    private val LIGHT_COLOR = Vector3(1f, 0.8f, 0.6f)
 
     // Ambient RGB and intensity (alpha)
-    val AMBIENT_COLOR = Vector3(0.6f, 0.6f, 1f)
+    private val AMBIENT_COLOR = Vector3(0.6f, 0.6f, 1f)
 
     // Attenuation coefficients for light falloff
-    val FALLOFF = Vector3(.4f, 3f, 20f)
+    private val FALLOFF = Vector3(.4f, 3f, 20f)
 
-    val lightZVals = floatArrayOf(0.00f, 0.05f, 0.1f, 0.15f, 0.2f, 0.25f, 0.3f)
-    var lightZIndex = 0
+    private val lightZVals = floatArrayOf(0.00f, 0.05f, 0.1f, 0.15f, 0.2f, 0.25f, 0.3f)
+    private var lightZIndex = 0
 
-    override fun show() {
+    private lateinit var normalsShader: ShaderProgram
+
+    private fun initializeDimensions(width: Int, height: Int) {
         ShaderProgram.pedantic = false
 
-        shader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/normals_lighting.frag"))
-        // ensure it compiled
-        if (!shader.isCompiled) throw GdxRuntimeException("Could not compile shader: ${shader.log}")
-        // print any warnings
-        if (shader.log.isNotEmpty()) System.out.println(shader.log)
+        normalsShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/normals_lighting.frag"))
+        if (!normalsShader.isCompiled) throw GdxRuntimeException("Could not compile shader: ${normalsShader.log}")
 
         // setup default uniforms
-        shader.begin()
+        normalsShader.begin()
 
         // our normal map
-        shader.setUniformi("u_normals", 1) //GL_TEXTURE1
+        normalsShader.setUniformi("u_normals", 1) //GL_TEXTURE1
 
         // light/ambient colors
         // LibGDX doesn't have Vector4 class at the moment, so we pass them individually...
-        shader.setUniformf("Resolution", app.width, app.height)
-        shader.setUniformf("LightColor", LIGHT_COLOR.x, LIGHT_COLOR.y, LIGHT_COLOR.z, LIGHT_INTENSITY)
-        shader.setUniformf("AmbientColor", AMBIENT_COLOR.x, AMBIENT_COLOR.y, AMBIENT_COLOR.z, AMBIENT_INTENSITY)
-        shader.setUniformf("Falloff", FALLOFF)
+        normalsShader.setUniformf("Resolution", app.width, app.height)
+        normalsShader.setUniformf("LightColor", LIGHT_COLOR.x, LIGHT_COLOR.y, LIGHT_COLOR.z, LIGHT_INTENSITY)
+        normalsShader.setUniformf("AmbientColor", AMBIENT_COLOR.x, AMBIENT_COLOR.y, AMBIENT_COLOR.z, AMBIENT_INTENSITY)
+        normalsShader.setUniformf("Falloff", FALLOFF)
 
         // LibGDX likes us to end the shader program
-        shader.end()
+        normalsShader.end()
 
-        app.stg.batch.shader = shader
+        app.stg.batch.shader = normalsShader
+    }
+
+    override fun resize(width: Int, height: Int) {
+        initializeDimensions(width, height)
+    }
+
+    override fun show() {
+        initializeDimensions(app.width.toInt(), app.height.toInt())
     }
 
     override fun render(delta: Float) {
@@ -73,7 +78,7 @@ class NormalsLighting(val app: App) : KtxScreen {
             lightZIndex++
             if (lightZIndex >= lightZVals.size) lightZIndex = 0
             LIGHT_POS.z = lightZVals[lightZIndex]
-            System.out.println("New light Z: " + LIGHT_POS.z)
+            println("New light Z: " + LIGHT_POS.z)
         }
 
         app.stg.batch.begin()
@@ -88,7 +93,7 @@ class NormalsLighting(val app: App) : KtxScreen {
         LIGHT_POS.y = y
 
         // send a Vector4f to GLSL
-        shader.setUniformf("LightPos", LIGHT_POS)
+        normalsShader.setUniformf("LightPos", LIGHT_POS)
 
         // bind normal map to texture unit 1
         rockNormals.bind(1)
@@ -106,6 +111,6 @@ class NormalsLighting(val app: App) : KtxScreen {
     }
 
     override fun dispose() {
-        shader.dispose()
+        normalsShader.dispose()
     }
 }

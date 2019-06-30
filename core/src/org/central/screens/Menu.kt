@@ -38,6 +38,7 @@ class Menu(val app: App) : KtxScreen {
             textButton("negative") { onClick { app.setScreen<Negative>() } }.cell(row = true)
             textButton("normals lighting") { onClick { app.setScreen<NormalsLighting>() } }.cell(row = true)
             textButton("sepia") { onClick { app.setScreen<Sepia>() } }.cell(row = true)
+            textButton("vignette") { onClick { app.setScreen<Vignette>() } }.cell(row = true)
             textButton("simplex noise") { onClick { app.setScreen<SimplexNoise>() } }.cell(row = true)
             textButton("depth test") { onClick { app.setScreen<DepthTest>() } }.cell(row = true)
             textButton("triangle") { onClick { app.setScreen<TriangleDemo>() } }.cell(row = true)

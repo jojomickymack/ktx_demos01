@@ -8,10 +8,15 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.Texture.TextureFilter
+import com.badlogic.gdx.utils.GdxRuntimeException
 import ktx.app.KtxScreen
 import org.central.App
 import org.central.assets.Images.badlogic
 import org.central.assets.Images.funny_face
+import kotlin.system.exitProcess
+
+
+private const val MAX_BLUR = 20f
 
 
 class Blur(val app: App) : KtxScreen {
@@ -19,24 +24,22 @@ class Blur(val app: App) : KtxScreen {
     private val tex1 = badlogic()
     private val tex2 = funny_face()
 
-    lateinit var blurShader: ShaderProgram
-    lateinit var blurTargetA: FrameBuffer
-    lateinit var blurTargetB: FrameBuffer
-    lateinit var fboRegion: TextureRegion
+    private lateinit var blurShader: ShaderProgram
+    private lateinit var blurTargetA: FrameBuffer
+    private lateinit var blurTargetB: FrameBuffer
+    private lateinit var fboRegion: TextureRegion
 
-    val MAX_BLUR = 2f
+    private fun initializeDimensions(width: Int, height: Int) {
+        tex1.setFilter(TextureFilter.Linear, TextureFilter.Linear)
+        tex2.setFilter(TextureFilter.Linear, TextureFilter.Linear)
 
-    override fun resize(width: Int, height: Int) {
-        super.resize(width, height)
+        // important since we aren't using some uniforms and attributes that SpriteBatch expects
+        ShaderProgram.pedantic = false
 
         blurShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/blur.frag"))
-        if (!blurShader.isCompiled) {
-            System.err.println(blurShader.log)
-            System.exit(0)
-        }
-        if (blurShader.log.isNotEmpty()) println(blurShader.log)
+        if (!blurShader.isCompiled) throw GdxRuntimeException("Could not compile shader: ${blurShader.log}")
 
-        //setup uniforms for our shader on resize
+        //setup uniforms for our shader
         blurShader.begin()
         blurShader.setUniformf("dir", 0f, 0f)
         blurShader.setUniformf("resolution", width.toFloat())
@@ -46,38 +49,16 @@ class Blur(val app: App) : KtxScreen {
         blurTargetA = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
         blurTargetB = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
         fboRegion = TextureRegion(blurTargetA.colorBufferTexture)
-    }
-
-    override fun show() {
-        tex1.setFilter(TextureFilter.Linear, TextureFilter.Linear)
-        tex2.setFilter(TextureFilter.Linear, TextureFilter.Linear)
-
-        // important since we aren't using some uniforms and attributes that SpriteBatch expects
-        ShaderProgram.pedantic = false
-
-        blurShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/blur.frag"))
-        if (!blurShader.isCompiled) {
-            System.err.println(blurShader.log)
-            System.exit(0)
-        }
-        if (blurShader.log.isNotEmpty()) println(blurShader.log)
-
-        //setup uniforms for our shader
-        blurShader.begin()
-        blurShader.setUniformf("dir", 0f, 0f)
-        blurShader.setUniformf("resolution", app.width)
-        blurShader.setUniformf("radius", 1f)
-        blurShader.end()
-
-        blurTargetA = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt(), app.height.toInt(), false)
-        blurTargetB = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt(), app.height.toInt(), false)
-        fboRegion = TextureRegion(blurTargetA.colorBufferTexture)
         fboRegion.flip(false, true)
     }
 
-    private fun renderEntities(batch: SpriteBatch) {
-        batch.draw(tex1, 0f, 0f)
-        batch.draw(tex2, tex1.width + 5f, 30f)
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        initializeDimensions(width, height)
+    }
+
+    override fun show() {
+        initializeDimensions(app.width.toInt(), app.height.toInt())
     }
 
     private fun resizeBatch(width: Int, height: Int) {
@@ -102,8 +83,9 @@ class Blur(val app: App) : KtxScreen {
         //now we can start drawing...
         app.stg.batch.begin()
 
-        //draw our scene here
-        renderEntities(app.sb)
+        //draw our scene her
+        app.sb.draw(tex1, 0f, 0f)
+        app.sb.draw(tex2, tex1.width + 5f, 30f)
 
         //finish rendering to the offscreen buffer
         app.stg.batch.flush()

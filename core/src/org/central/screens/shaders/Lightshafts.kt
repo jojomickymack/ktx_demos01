@@ -6,8 +6,10 @@ import ktx.app.KtxScreen
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.utils.GdxRuntimeException
 import org.central.App
 import org.central.assets.Images.small_window_wall
+import kotlin.system.exitProcess
 
 
 class Lightshafts(val app: App) : KtxScreen {
@@ -18,17 +20,23 @@ class Lightshafts(val app: App) : KtxScreen {
     private lateinit var occludersFbo: FrameBuffer
     private lateinit var occlusionApprox: FrameBuffer
 
-    private val occlusionApproxShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/occlusion.frag"))
+    private lateinit var occlusionApproxShader: ShaderProgram
 
-    override fun resize(width: Int, height: Int) {
-        super.resize(width, height)
+    private fun initializeDimensions(width: Int, height: Int) {
+        occlusionApproxShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/occlusion.frag"))
+        if (!occlusionApproxShader.isCompiled) throw GdxRuntimeException("Could not compile shader: ${occlusionApproxShader.log}")
+
         occludersFbo = FrameBuffer(Pixmap.Format.RGBA8888, width / downscaleFactor, height / downscaleFactor, false)
         occlusionApprox = FrameBuffer(Pixmap.Format.RGB888, width / downscaleFactor, height / downscaleFactor, false)
     }
 
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        initializeDimensions(width, height)
+    }
+
     override fun show() {
-        occludersFbo = FrameBuffer(Pixmap.Format.RGBA8888, app.width.toInt() / downscaleFactor, app.height.toInt() / downscaleFactor, false)
-        occlusionApprox = FrameBuffer(Pixmap.Format.RGB888, app.width.toInt() / downscaleFactor, app.height.toInt() / downscaleFactor, false)
+        initializeDimensions(app.width.toInt(), app.height.toInt())
     }
 
     override fun render(delta: Float) {
