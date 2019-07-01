@@ -12,11 +12,11 @@ import org.central.gdxmenu.app.R
 
 class DemosMainMenu : Fragment() {
 
-    lateinit var myView: View
-    lateinit var demosMenuFragment: DemosMainMenu
-    lateinit var itemList: RecyclerView
-    var demosList = mutableListOf("models", "opengl", "physics", "shaders")
-    lateinit var adapter: MainDemosAdaptor
+    private lateinit var myView: View
+    private lateinit var demosMenuFragment: DemosMainMenu
+    private lateinit var itemList: RecyclerView
+    private var demosList = mutableListOf("models", "opengl", "physics", "shaders")
+    private lateinit var adapter: MainDemosAdaptor
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.demos_menu_main, container, false)

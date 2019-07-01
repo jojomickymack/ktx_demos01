@@ -1,6 +1,5 @@
 package org.central.gdxmenu.app.pages
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -10,26 +9,14 @@ import android.widget.Button
 import org.central.gdxmenu.app.R
 import org.central.gdxmenu.app.ParentActivity
 import android.content.Intent
+import org.central.gdxmenu.app.services.MusicPlayingService
 
-/**
- * this is the 'settings' page. Originally I used it for debugging the ContentProvider. Now it clears the sqlite database
- * and turns the music off and on using a broadcast intent
- */
 
 class GdxMenuSettings : Fragment() {
-
-    lateinit var alert: AlertDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val parent = activity as ParentActivity
-
-        // setting up the message that appears when you click the 'clear database' button
-        val builder = AlertDialog.Builder(this.context)
-        builder.setTitle("hello")
-            .setMessage("your favorites have been cleared")
-
-        alert = builder.create()
 
         val rootView = inflater.inflate(R.layout.gdxmenu_settings_main, container, false)
 
@@ -38,13 +25,13 @@ class GdxMenuSettings : Fragment() {
 
         startMusic.setOnClickListener { v ->
             val broadcastIntent = Intent()
-            broadcastIntent.action = "org.central.gdxmenu.app.Start"
+            broadcastIntent.action = MusicPlayingService.startAction
             parent.sendBroadcast(broadcastIntent)
         }
 
         stopMusic.setOnClickListener { v ->
             val broadcastIntent = Intent()
-            broadcastIntent.action = "org.central.gdxmenu.app.Stop"
+            broadcastIntent.action = MusicPlayingService.stopAction
             parent.sendBroadcast(broadcastIntent)
         }
 

@@ -20,7 +20,7 @@ class Splash : Fragment() {
             fragmentManager!!.beginTransaction()
                 .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
                 .replace(R.id.parent_container, DemosMainMenu())
-                .addToBackStack("Loading")
+                .addToBackStack("Splash")
                 .commit()
         }
 
@@ -28,7 +28,7 @@ class Splash : Fragment() {
             fragmentManager!!.beginTransaction()
                 .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
                 .replace(R.id.parent_container, GdxMenuSettings())
-                .addToBackStack("Loading")
+                .addToBackStack("Splash")
                 .commit()
         }
 

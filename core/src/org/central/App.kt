@@ -109,6 +109,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         addScreen(Blur(this))
         addScreen(NormalsLighting(this))
         addScreen(ModelView(this))
+        addScreen(ModelAnimatedView(this))
         addScreen(Lightshafts(this))
         addScreen(Water(this))
         addScreen(SimpleGravity(this))
@@ -123,7 +124,8 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "simplex" -> setScreen<SimplexNoise>()
             "blur" -> setScreen<Blur>()
             "normals" -> setScreen<NormalsLighting>()
-            "models" -> setScreen<ModelView>()
+            "model" -> setScreen<ModelView>()
+            "model-animated" -> setScreen<ModelAnimatedView>()
             "lightshafts" -> setScreen<Lightshafts>()
             "water" -> setScreen<Water>()
             "gravity" -> setScreen<SimpleGravity>()
@@ -149,8 +151,6 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         this.hudSb.dispose()
         this.stg.dispose()
         this.hudStg.dispose()
-
-//        super.dispose()
     }
 
     override fun resize(width: Int, height: Int) {

@@ -14,10 +14,12 @@ import org.central.gdxmenu.app.R
 
 class MusicPlayingService : Service() {
 
-    lateinit var player: MediaPlayer
+    companion object {
+        val startAction = "org.central.gdxmenu.app.Start"
+        val stopAction = "org.central.gdxmenu.app.Stop"
+    }
 
-    val startAction = "org.central.gdxmenu.app.Start"
-    val stopAction = "org.central.gdxmenu.app.Stop"
+    private lateinit var player: MediaPlayer
 
     var playing = false
 

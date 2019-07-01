@@ -15,13 +15,13 @@ import org.central.gdxmenu.app.game.GameActivity
 
 class DemosMenuByType : Fragment() {
 
-    lateinit var myView: View
-    lateinit var demosMenuByTypeFragment: DemosMenuByType
-    lateinit var itemList: RecyclerView
-    var modelDemosList = mutableListOf("models")
-    var openglDemosList = mutableListOf("triangle", "depthtest")
-    var physicsDemosList = mutableListOf("gravity")
-    var shadersDemosList = mutableListOf("negative", "sepia", "vignette", "simplex", "blur", "normals", "lightshafts", "water")
+    private lateinit var myView: View
+    private lateinit var demosMenuByTypeFragment: DemosMenuByType
+    private lateinit var itemList: RecyclerView
+    private var modelDemosList = mutableListOf("model", "model-animated")
+    private var openglDemosList = mutableListOf("triangle", "depthtest")
+    private var physicsDemosList = mutableListOf("gravity")
+    private var shadersDemosList = mutableListOf("negative", "sepia", "vignette", "simplex", "blur", "normals", "lightshafts", "water")
 
     lateinit var adapter: MainDemosByTypeAdaptor
     var chosenType = ""

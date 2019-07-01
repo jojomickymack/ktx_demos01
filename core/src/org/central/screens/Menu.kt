@@ -10,10 +10,9 @@ import org.central.assets.Images.*
 import ktx.actors.onClick
 import ktx.scene2d.table
 import ktx.scene2d.textButton
-import org.central.screens.models.ModelView
-import org.central.screens.opengl.DepthTest
-import org.central.screens.opengl.TriangleDemo
-import org.central.screens.physics.SimpleGravity
+import org.central.screens.models.*
+import org.central.screens.opengl.*
+import org.central.screens.physics.*
 import org.central.screens.shaders.*
 
 
@@ -42,7 +41,8 @@ class Menu(val app: App) : KtxScreen {
             textButton("simplex noise") { onClick { app.setScreen<SimplexNoise>() } }.cell(row = true)
             textButton("depth test") { onClick { app.setScreen<DepthTest>() } }.cell(row = true)
             textButton("triangle") { onClick { app.setScreen<TriangleDemo>() } }.cell(row = true)
-            textButton("model view") { onClick { app.setScreen<ModelView>() } }.cell(row = true)
+            textButton("model") { onClick { app.setScreen<ModelView>() } }.cell(row = true)
+            textButton("animated model") { onClick { app.setScreen<ModelAnimatedView>() } }.cell(row = true)
             textButton("lightshafts") { onClick { app.setScreen<Lightshafts>() } }.cell(row = true)
             textButton("water") { onClick { app.setScreen<Water>() } }.cell(row = true)
         }

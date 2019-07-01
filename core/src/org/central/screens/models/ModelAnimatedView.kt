@@ -2,13 +2,13 @@ package org.central.screens.models
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
-import ktx.app.KtxScreen
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.Model
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.AmbientLight
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute
@@ -16,10 +16,12 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.badlogic.gdx.utils.Array as GdxArray
+import com.badlogic.gdx.graphics.g3d.utils.AnimationController
+import ktx.app.KtxScreen
 import org.central.App
 
 
-class ModelView(val app: App) : KtxScreen {
+class ModelAnimatedView(val app: App) : KtxScreen {
 
     private lateinit var modelStgModelBatch: ModelBatch
 
@@ -28,37 +30,35 @@ class ModelView(val app: App) : KtxScreen {
     private lateinit var modelStgCam: PerspectiveCamera
 
     private lateinit var camController: CameraInputController
-    private lateinit var directionalLight: DirectionalLight
 
-    private var lightX = 20f
-    private var lightXInc = 1
-    private var lightXRange = 100
+    private lateinit var controller: AnimationController
 
     private lateinit var assets: AssetManager
     private lateinit var environment: Environment
 
-    private val modelString = "models/suzanne/suzanne.g3db"
-    private var instances = GdxArray<ModelInstance>()
+    private val modelString = "models/benddemo/benddemo.g3db"
 
-    var loading = false
+    private var instances = GdxArray<ModelInstance>()
+    private var controllers = GdxArray<AnimationController>()
+    private var loading = false
 
     override fun show() {
+
         modelStgModelBatch = ModelBatch()
 
         modelStgCam = PerspectiveCamera(10f, app.width, app.height)
-        modelStgView = StretchViewport(360f, 785f, modelStgCam)
+
+        modelStgView = StretchViewport(1024f, 768f, modelStgCam)
         modelStg = Stage(modelStgView)
 
         environment = Environment()
+        environment.set(ColorAttribute(AmbientLight, 0.4f, 0.4f, 0.4f, 1f))
+        environment.add(DirectionalLight().set(0f, 0f, 1f, 500f, 500f, 6f))
 
-        directionalLight = DirectionalLight().set(1f, 1f, 1f, lightX, -20f, -50f)
-
-        environment.add(directionalLight)
-
-        modelStgCam.position.set(0f, 0f, 20f)
+        modelStgCam.position.set(0f, 0f, 50f)
         modelStgCam.lookAt(0f, 0f, 0f)
-        modelStgCam.near = 0.7f
-        modelStgCam.far = 100f
+        modelStgCam.near = 0.2f
+        modelStgCam.far = 300f
         modelStgCam.update()
 
         camController = CameraInputController(modelStgCam)
@@ -66,20 +66,36 @@ class ModelView(val app: App) : KtxScreen {
 
         assets = AssetManager()
         assets.load(modelString, Model::class.java)
+
         loading = true
     }
 
     private fun doneLoading() {
-        val suzanne = assets.get(modelString, Model::class.java)
+        val blob = assets.get(modelString, Model::class.java)
 
-        val modelInstance = ModelInstance(suzanne)
-        modelInstance.materials.forEach {
-            it.set(IntAttribute(IntAttribute.CullFace, GL20.GL_NONE))
-            it.remove(ColorAttribute.Emissive) // weird - the model 'glows' unless you unset this
+        var x = -25f
+        while (x <= 25f) {
+            var z = -25f
+            while (z <= 25f) {
+                val modelInstance = ModelInstance(blob)
+                modelInstance.materials.forEach {
+                    it.set(IntAttribute(IntAttribute.CullFace, GL20.GL_NONE))
+                    it.remove(ColorAttribute.Emissive)
+                }
+                modelInstance.transform.setToTranslation(x, 0f, z)
+                instances.add(modelInstance)
+                val controllersInstance = AnimationController(modelInstance)
+                controllersInstance.setAnimation("BEND", -1, object : AnimationController.AnimationListener {
+                    override fun onEnd(animation: AnimationController.AnimationDesc) {}
+                    override fun onLoop(animation: AnimationController.AnimationDesc) {}
+                })
+                controllers.add(controllersInstance)
+
+                z += 10f
+            }
+            x += 10f
         }
 
-        modelInstance.transform.setToTranslation(0f, 0f, 0f)
-        instances.add(modelInstance)
         loading = false
     }
 
@@ -87,21 +103,22 @@ class ModelView(val app: App) : KtxScreen {
         if (loading && assets.update()) doneLoading()
         camController.update()
 
-        Gdx.gl.glViewport(0, 0, app.width.toInt(), app.height.toInt())
+        Gdx.gl.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
         Gdx.gl.glClearColor(0.6f, 0.6f, 0.6f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
+
+        if (!loading) controllers.forEach { it.update(delta) }
 
         modelStgModelBatch.begin(modelStgCam)
         modelStgModelBatch.render(instances, environment)
         modelStgModelBatch.end()
 
-        lightX += lightXInc
-        if (lightX > lightXRange || lightX < -lightXRange) lightXInc *= -1
-        directionalLight.set(1f, 1f, 1f, lightX, -20f, -50f)
+        app.drawFps()
     }
 
     override fun dispose() {
         modelStgModelBatch.dispose()
+        instances.clear()
         assets.dispose()
     }
 }
