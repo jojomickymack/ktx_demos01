@@ -2,24 +2,24 @@ package org.central.screens.models
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
-import ktx.app.KtxScreen
-import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
 import com.badlogic.gdx.graphics.PerspectiveCamera
-import com.badlogic.gdx.graphics.g3d.Environment
-import com.badlogic.gdx.graphics.g3d.Model
-import com.badlogic.gdx.graphics.g3d.ModelBatch
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
-import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute
+import com.badlogic.gdx.graphics.g3d.*
+import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
+import com.badlogic.gdx.utils.Array as GdxArray
+import ktx.app.KtxScreen
+import org.central.App
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.StretchViewport
-import com.badlogic.gdx.utils.Array as GdxArray
-import org.central.App
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
+import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute
+import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader
+import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider
+import com.badlogic.gdx.graphics.g3d.ModelBatch
 
 
-class ModelView(val app: App) : KtxScreen {
+class ModelTinted(val app: App) : KtxScreen {
 
     private lateinit var modelStgModelBatch: ModelBatch
 
@@ -31,7 +31,7 @@ class ModelView(val app: App) : KtxScreen {
     private lateinit var directionalLight: DirectionalLight
 
     private var lightX = 20f
-    private var lightXInc = 1
+    private var lightXInc = 1f
     private var lightXRange = 100
 
     private lateinit var assets: AssetManager
@@ -40,19 +40,25 @@ class ModelView(val app: App) : KtxScreen {
     private val modelString = "models/suzanne/suzanne_tex.g3db"
     private var instances = GdxArray<ModelInstance>()
 
+    private lateinit var config: DefaultShader.Config
+
     var loading = false
 
     override fun show() {
-        modelStgModelBatch = ModelBatch()
+
+        config = DefaultShader.Config()
+        config.numDirectionalLights = 1
+
+        config.fragmentShader = Gdx.files.internal("shaders/tweaked_default.frag").readString()
+
+        modelStgModelBatch = ModelBatch(DefaultShaderProvider(config))
 
         modelStgCam = PerspectiveCamera(10f, app.width, app.height)
         modelStgView = StretchViewport(360f, 785f, modelStgCam)
         modelStg = Stage(modelStgView)
 
         environment = Environment()
-
         directionalLight = DirectionalLight().set(1f, 1f, 1f, lightX, -20f, -50f)
-
         environment.add(directionalLight)
 
         modelStgCam.position.set(0f, 0f, 20f)
@@ -80,6 +86,7 @@ class ModelView(val app: App) : KtxScreen {
         }
 
         instances.add(modelInstance)
+
         loading = false
     }
 
@@ -91,9 +98,11 @@ class ModelView(val app: App) : KtxScreen {
         Gdx.gl.glClearColor(0.6f, 0.6f, 0.6f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
-        modelStgModelBatch.begin(modelStgCam)
-        modelStgModelBatch.render(instances, environment)
-        modelStgModelBatch.end()
+        if (!loading) {
+            modelStgModelBatch.begin(modelStgCam)
+            modelStgModelBatch.render(instances, environment)
+            modelStgModelBatch.end()
+        }
 
         lightX += lightXInc
         if (lightX > lightXRange || lightX < -lightXRange) lightXInc *= -1

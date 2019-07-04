@@ -21,7 +21,7 @@ import ktx.app.KtxScreen
 import org.central.App
 
 
-class ModelAnimatedView(val app: App) : KtxScreen {
+class ModelAnimated(val app: App) : KtxScreen {
 
     private lateinit var modelStgModelBatch: ModelBatch
 

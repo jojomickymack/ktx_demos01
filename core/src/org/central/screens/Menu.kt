@@ -44,7 +44,9 @@ class Menu(val app: App) : KtxScreen {
             textButton("depth test") { onClick { app.setScreen<DepthTest>() } }.cell(row = true)
             textButton("triangle") { onClick { app.setScreen<TriangleDemo>() } }.cell(row = true)
             textButton("model") { onClick { app.setScreen<ModelView>() } }.cell(row = true)
-            textButton("animated model") { onClick { app.setScreen<ModelAnimatedView>() } }.cell(row = true)
+            textButton("model tinted") { onClick { app.setScreen<ModelTinted>() } }.cell(row = true)
+            textButton("model shader") { onClick { app.setScreen<ModelCustomShader>() } }.cell(row = true)
+            textButton("model animated") { onClick { app.setScreen<ModelAnimated>() } }.cell(row = true)
             textButton("lightshafts") { onClick { app.setScreen<Lightshafts>() } }.cell(row = true)
             textButton("water") { onClick { app.setScreen<Water>() } }.cell(row = true)
         }

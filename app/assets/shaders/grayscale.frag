@@ -10,7 +10,5 @@ void main() {
 
     // GRAYSCALE
     float gray = dot(texColor.rgb, vec3(0.299, 0.587, 0.114));
-
-    // SEPIA
     gl_FragColor = vec4(gray, gray, gray, 1.0);
 }
