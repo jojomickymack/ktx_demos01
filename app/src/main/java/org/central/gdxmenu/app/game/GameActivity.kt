@@ -3,8 +3,6 @@ package org.central.gdxmenu.app.game
 import android.os.Bundle
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
-import android.support.v4.app.NotificationCompat.getExtras
-import android.content.Intent
 import org.central.App
 
 

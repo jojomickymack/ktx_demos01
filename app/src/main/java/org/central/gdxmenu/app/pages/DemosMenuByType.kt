@@ -20,7 +20,7 @@ class DemosMenuByType : Fragment() {
     private lateinit var itemList: RecyclerView
     private var modelDemosList = mutableListOf("model", "model-tinted", "model-custom-shader", "model-animated")
     private var openglDemosList = mutableListOf("triangle", "depthtest")
-    private var physicsDemosList = mutableListOf("gravity")
+    private var physicsDemosList = mutableListOf("gravity", "draggable-mousejoint")
     private var shadersDemosList = mutableListOf("negative", "grayscale", "sepia", "vignette", "simplex", "twist", "blur", "normals", "lightshafts", "water")
 
     lateinit var adapter: MainDemosByTypeAdaptor

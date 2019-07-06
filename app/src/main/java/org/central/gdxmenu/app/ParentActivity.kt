@@ -18,7 +18,7 @@ class ParentActivity : AppCompatActivity() {
         val settings = findViewById(R.id.parent_toolbar_settings) as ImageButton
 
         if (savedInstanceState == null) {
-            startService(Intent(this, MusicPlayingService::class.java))
+            //startService(Intent(this, MusicPlayingService::class.java))
             supportFragmentManager.beginTransaction()
                 .setCustomAnimations(R.anim.enter_from_top, R.anim.fade_out)
                 .add(R.id.parent_container, Splash())

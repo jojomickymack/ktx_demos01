@@ -34,6 +34,7 @@ class Menu(val app: App) : KtxScreen {
             setFillParent(true)
             textButton("blur") { onClick { app.setScreen<Blur>() } }.cell(row = true)
             textButton("gravity") { onClick { app.setScreen<SimpleGravity>() } }.cell(row = true)
+            textButton("mouse joint") { onClick { app.setScreen<DraggableMouseJoint>() } }.cell(row = true)
             textButton("negative") { onClick { app.setScreen<Negative>() } }.cell(row = true)
             textButton("grayscale") { onClick { app.setScreen<Grayscale>() } }.cell(row = true)
             textButton("sepia") { onClick { app.setScreen<Sepia>() } }.cell(row = true)

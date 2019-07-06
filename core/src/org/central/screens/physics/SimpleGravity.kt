@@ -17,8 +17,8 @@ class SimpleGravity(val app: App) : KtxScreen {
     private val debugRenderer = Box2DDebugRenderer()
     private val world = createWorld(gravity = Vector2(0f, -20f))
     private val scaleDown = 0.25f
-    private val scaledWidth = app.width * scaleDown
-    private val scaledHeight = app.height * scaleDown
+    private var scaledWidth = 0f
+    private var scaledHeight = 0f
 
     fun createBody(x: Float, y: Float) {
         var body = world.body {
@@ -31,13 +31,14 @@ class SimpleGravity(val app: App) : KtxScreen {
         }
     }
 
-    override fun show() {
+    fun initializeDimensions(width: Int, height: Int) {
+        scaledWidth = width * scaleDown
+        scaledHeight = height * scaleDown
+
         app.cam.viewportWidth = scaledWidth
         app.cam.viewportHeight = scaledHeight
         app.cam.position.x = 0f + scaledWidth / 2
         app.cam.position.y = 0f + scaledHeight / 2
-
-        Gdx.input.inputProcessor = InputMultiplexer(inputProcessor, app.hudStg)
 
         var ground = world.body {
             type = BodyType.StaticBody
@@ -45,6 +46,15 @@ class SimpleGravity(val app: App) : KtxScreen {
             position.y = 10f
             box(scaledWidth - 20f, 10f)
         }
+    }
+
+    override fun resize(width: Int, height: Int) {
+        initializeDimensions(width, height)
+    }
+
+    override fun show() {
+        Gdx.input.inputProcessor = InputMultiplexer(inputProcessor, app.hudStg)
+        initializeDimensions(app.width.toInt(), app.height.toInt())
     }
 
     override fun render(delta: Float) {

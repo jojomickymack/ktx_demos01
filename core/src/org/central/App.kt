@@ -19,6 +19,7 @@ import ktx.scene2d.Scene2DSkin
 import org.central.screens.Menu
 import org.central.screens.models.*
 import org.central.screens.opengl.*
+import org.central.screens.physics.DraggableMouseJoint
 import org.central.screens.physics.SimpleGravity
 import org.central.screens.shaders.*
 
@@ -114,6 +115,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         addScreen(Lightshafts(this))
         addScreen(Water(this))
         addScreen(SimpleGravity(this))
+        addScreen(DraggableMouseJoint(this))
 
         when (gameChoice) {
             "menu" -> setScreen<Menu>()
@@ -134,6 +136,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "lightshafts" -> setScreen<Lightshafts>()
             "water" -> setScreen<Water>()
             "gravity" -> setScreen<SimpleGravity>()
+            "draggable-mousejoint" -> setScreen<DraggableMouseJoint>()
             else -> setScreen<Menu>()
         }
     }
