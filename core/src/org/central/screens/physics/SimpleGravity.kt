@@ -11,12 +11,6 @@ import org.central.App
 import ktx.app.KtxInputAdapter
 import ktx.box2d.body
 
-/**
- *     in order for the world to work right (units in the box2d world are in meters, not pixels), the screen needs
- * to be scaled down to avoid resorting to large sizes and speeds.
- *     this presents a problem reconciling the difference in dimensions of the desktop/android launchers. When the
- * camera is zoomed in on android, everything lines up. When the camera is not zoomed in on desktop, everything lines up.
- */
 
 class SimpleGravity(val app: App) : KtxScreen {
 
@@ -43,8 +37,6 @@ class SimpleGravity(val app: App) : KtxScreen {
         app.cam.position.x = 0f + scaledWidth / 2
         app.cam.position.y = 0f + scaledHeight / 2
 
-        // comment out the camera zoom when running on desktop
-        app.cam.zoom = scaleDown
         Gdx.input.inputProcessor = InputMultiplexer(inputProcessor, app.hudStg)
 
         var ground = world.body {
@@ -56,6 +48,7 @@ class SimpleGravity(val app: App) : KtxScreen {
     }
 
     override fun render(delta: Float) {
+        app.cam.update()
         world.step(1/5f, 6, 2)
         debugRenderer.render(world, app.cam.combined)
     }

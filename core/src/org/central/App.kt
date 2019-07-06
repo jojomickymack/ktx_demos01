@@ -50,7 +50,6 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
     lateinit var ic: InputCtl
     lateinit var gpc: GamepadCtl
 
-    lateinit var sr: ShapeRenderer
     var dialogMode = false
 
     override fun create() {
@@ -76,9 +75,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
 
         this.hudCam = OrthographicCamera(this.width, this.height)
         this.hudView = StretchViewport(stretchWidth, stretchHeight, this.hudCam)
-        this.hudStg = Stage(this.hudView , this.hudSb)
-
-        sr = ShapeRenderer()
+        this.hudStg = Stage(this.hudView, this.hudSb)
 
         ic = InputCtl(this)
         gpc = GamepadCtl(this)
@@ -141,14 +138,6 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         }
     }
 
-    override fun render() {
-        super.render()
-        this.stg.act()
-        this.stg.draw()
-        this.hudStg.act()
-        this.hudStg.draw()
-    }
-
     override fun dispose() {
         this.textureManager.dispose()
         this.soundManager.dispose()
@@ -164,8 +153,6 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
     override fun resize(width: Int, height: Int) {
         this.width = width.toFloat()
         this.height = height.toFloat()
-        this.cam.setToOrtho(false, this.width, this.height)
-        this.stg.batch.projectionMatrix = this.cam.combined
     }
 
     fun drawFps() {

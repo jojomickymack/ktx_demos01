@@ -38,6 +38,8 @@ class Water(val app: App) : KtxScreen {
 
         sceneFbo = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
         refractionFbo = FrameBuffer(Pixmap.Format.RGBA8888, width / downscaleFactor, height / downscaleFactor, false)
+        app.cam.setToOrtho(false, width.toFloat(), height.toFloat())
+        app.stg.batch.projectionMatrix = app.cam.combined
     }
 
     override fun resize(width: Int, height: Int) {

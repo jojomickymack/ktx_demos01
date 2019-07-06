@@ -33,6 +33,8 @@ class Lightshafts(val app: App) : KtxScreen {
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         initializeDimensions(width, height)
+        app.cam.setToOrtho(false, width.toFloat(), height.toFloat())
+        app.stg.batch.projectionMatrix = app.cam.combined
     }
 
     override fun show() {

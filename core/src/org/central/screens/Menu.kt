@@ -55,8 +55,6 @@ class Menu(val app: App) : KtxScreen {
         app.ic.aPressed = false
         app.dialogMode = true
 
-        bgImage.setSize(app.width, app.height)
-
         app.stg += bgImage
         app.hudStg += table
     }
@@ -68,6 +66,8 @@ class Menu(val app: App) : KtxScreen {
         with(app) {
             stg.act(delta)
             stg.draw()
+            hudStg.act(delta)
+            hudStg.draw()
         }
     }
 
