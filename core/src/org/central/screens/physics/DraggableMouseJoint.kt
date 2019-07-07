@@ -141,21 +141,12 @@ class DraggableMouseJoint(val app: App) : KtxScreen {
 
     override fun render(delta: Float) {
         app.cam.update()
-        world.step(1/5f, 6, 2)
-        debugRenderer.render(world, app.cam.combined)
-
-        world.step(delta, 8, 3)
+        world.step(delta, 6, 2)
 
         // next we clear the color buffer and set the camera
         // matrices
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        app.cam.update()
 
-        // next we use the debug renderer. Note that we
-        // simply apply the camera again and then call
-        // the renderer. the camera.apply() call is actually
-        // not needed as the opengl matrices are already set
-        // by the spritebatch which in turn uses the camera matrices :)
         debugRenderer.render(world, app.cam.combined)
     }
 

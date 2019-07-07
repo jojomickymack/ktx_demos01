@@ -23,7 +23,7 @@ import ktx.box2d.body
 
 class ChainDemo(val app: App) : KtxScreen {
     private lateinit var debugRenderer: Box2DDebugRenderer
-    private var world = World(Vector2(0f, -5f), true)
+    private var world = World(Vector2(0f, -20f), true)
 
     private val scaleDown = 0.25f
     private var scaledWidth = 0f
@@ -108,12 +108,12 @@ class ChainDemo(val app: App) : KtxScreen {
         edgeShape.dispose()
 
         val shape = PolygonShape()
-        shape.setAsBox(0.8f, 0.5f)
+        shape.setAsBox(3.0f, 1f)
 
         val fd = FixtureDef()
         fd.shape = shape
         fd.density = 20f
-        fd.friction = 5f
+        fd.friction = 0.2f
 
         val jointDef = RevoluteJointDef()
         jointDef.collideConnected = false
@@ -131,9 +131,9 @@ class ChainDemo(val app: App) : KtxScreen {
         world.createJoint(jointDef)
         var prevBody = body
 
-        val chainStep = 1
+        val chainStep = 3
 
-        for (i in centerX.toInt() + chainStep..centerX.toInt() + 78 step chainStep) {
+        for (i in centerX.toInt() + chainStep..centerX.toInt() + 80 step chainStep) {
             val bd = BodyDef()
             bd.type = BodyType.DynamicBody
             bd.position.set(i.toFloat(), chainHeight)
@@ -151,21 +151,12 @@ class ChainDemo(val app: App) : KtxScreen {
 
     override fun render(delta: Float) {
         app.cam.update()
-        world.step(1/5f, 6, 2)
-        debugRenderer.render(world, app.cam.combined)
-
-        world.step(Gdx.app.graphics.deltaTime, 3, 3)
+        world.step(delta, 6, 2)
 
         // next we clear the color buffer and set the camera
         // matrices
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        app.cam.update()
 
-        // next we use the debug renderer. Note that we
-        // simply apply the camera again and then call
-        // the renderer. the camera.apply() call is actually
-        // not needed as the opengl matrices are already set
-        // by the spritebatch which in turn uses the camera matrices :)
         debugRenderer.render(world, app.cam.combined)
     }
 

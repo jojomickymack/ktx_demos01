@@ -62,7 +62,7 @@ class SimpleGravity(val app: App) : KtxScreen {
 
     override fun render(delta: Float) {
         app.cam.update()
-        world.step(1/5f, 6, 2)
+        world.step(delta, 3, 3)
         debugRenderer.render(world, app.cam.combined)
     }
 
