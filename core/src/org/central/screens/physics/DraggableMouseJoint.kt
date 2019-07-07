@@ -16,18 +16,19 @@ import com.badlogic.gdx.physics.box2d.*
 import com.badlogic.gdx.physics.box2d.QueryCallback
 import com.badlogic.gdx.physics.box2d.BodyDef
 import ktx.box2d.mouseJointWith
+import kotlin.math.min
 
 
 class DraggableMouseJoint(val app: App) : KtxScreen {
     private lateinit var debugRenderer: Box2DDebugRenderer
     private var world = World(Vector2(0f, 0f), true)
 
-    private val scaleDown = 0.25f
+    private val scaleDown = 0.01f
     private var scaledWidth = 0f
     private var scaledHeight = 0f
 
-    private val wallMargin = 20f
-    private val wallWidth = 10f
+    private val wallMargin = 0.5f
+    private val wallWidth = 0.5f
 
     // this is to make it so randomly generated bodies are always inside the walls
     private val minDistance = wallMargin + wallWidth
@@ -40,22 +41,22 @@ class DraggableMouseJoint(val app: App) : KtxScreen {
 
     private lateinit var groundBody: Body
 
-    private fun createRectangle(x: Float, y: Float, width: Int, height: Int) {
+    private fun createRectangle(x: Float, y: Float, width: Float, height: Float) {
         var body = world.body {
             type = BodyType.DynamicBody
             position.set(Vector2(x, scaledHeight - y))
-            box(width = width.toFloat(), height = height.toFloat()) {
+            box(width = width, height = height) {
                 density = 20f
                 restitution = 0.0f
             }
         }
     }
 
-    private fun createCircle(x: Float, y: Float, radius: Int) {
+    private fun createCircle(x: Float, y: Float, radius: Float) {
         var body = world.body {
             type = BodyType.DynamicBody
             position.set(Vector2(x, scaledHeight - y))
-            circle(radius.toFloat()) {
+            circle(radius) {
                 density = 20f
                 restitution = 0.5f
             }
@@ -74,29 +75,29 @@ class DraggableMouseJoint(val app: App) : KtxScreen {
         var top = world.body {
             type = BodyType.StaticBody
             position.x = scaledWidth / 2
-            position.y = scaledHeight - wallWidth
-            box(scaledWidth - wallMargin, wallWidth)
+            position.y = scaledHeight - wallMargin
+            box(scaledWidth - wallWidth - wallMargin, wallWidth)
         }
 
         var bottom = world.body {
             type = BodyType.StaticBody
             position.x = scaledWidth / 2
-            position.y = 10f
-            box(scaledWidth - wallMargin, wallWidth)
+            position.y = wallMargin
+            box(scaledWidth - wallWidth - wallMargin, wallWidth)
         }
 
         var left = world.body {
             type = BodyType.StaticBody
-            position.x = 10f
+            position.x = wallMargin
             position.y = scaledHeight / 2
-            box(wallWidth, scaledHeight - wallMargin)
+            box(wallWidth, scaledHeight - wallWidth - wallMargin)
         }
 
         var right = world.body {
             type = BodyType.StaticBody
-            position.x = scaledWidth - 10f
+            position.x = scaledWidth - wallMargin
             position.y = scaledHeight / 2
-            box(wallWidth, scaledHeight - wallMargin)
+            box(wallWidth, scaledHeight - wallWidth - wallMargin)
         }
     }
 
@@ -116,8 +117,8 @@ class DraggableMouseJoint(val app: App) : KtxScreen {
         groundBody = world.createBody(BodyDef())
 
         for (i in 0..15) {
-            val randomWidth = (MathUtils.random() * 20f).toInt() + 1
-            val randomHeight = (MathUtils.random() * 20f).toInt() + 1
+            val randomWidth = MathUtils.random() * 0.7f
+            val randomHeight = MathUtils.random() * 0.7f
 
             // in order to get the boxes inside of the borders - r.nextInt(high - low) + low;
 
@@ -128,7 +129,7 @@ class DraggableMouseJoint(val app: App) : KtxScreen {
         }
 
         for (i in 0..10) {
-            val randomRadius = (MathUtils.random() * 15f).toInt() + 1
+            val randomRadius = MathUtils.random() * 0.7f
 
             // in order to get the boxes inside of the borders - r.nextInt(high - low) + low;
 
@@ -139,9 +140,22 @@ class DraggableMouseJoint(val app: App) : KtxScreen {
         }
     }
 
+    private val stepTime = 1f/45f
+    private var accumulator = 0f
+
+    private fun stepWorld() {
+        val delta = Gdx.graphics.deltaTime
+        accumulator += min(delta, 0.25f)
+
+        if (accumulator >= stepTime) {
+            accumulator -= stepTime
+            world.step(stepTime, 6, 2)
+        }
+    }
+
     override fun render(delta: Float) {
         app.cam.update()
-        world.step(delta, 6, 2)
+        stepWorld()
 
         // next we clear the color buffer and set the camera
         // matrices

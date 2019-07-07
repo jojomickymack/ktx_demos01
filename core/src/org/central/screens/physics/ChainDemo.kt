@@ -19,18 +19,19 @@ import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef
 import com.badlogic.gdx.physics.box2d.FixtureDef
 import com.badlogic.gdx.physics.box2d.PolygonShape
 import ktx.box2d.body
+import kotlin.math.min
 
 
 class ChainDemo(val app: App) : KtxScreen {
     private lateinit var debugRenderer: Box2DDebugRenderer
     private var world = World(Vector2(0f, -20f), true)
 
-    private val scaleDown = 0.25f
+    private val scaleDown = 0.01f
     private var scaledWidth = 0f
     private var scaledHeight = 0f
 
-    private val wallMargin = 20f
-    private val wallWidth = 10f
+    private val wallMargin = 0.5f
+    private val wallWidth = 0.5f
 
     /** our mouse joint  */
     private var mouseJoint: MouseJoint? = null
@@ -52,29 +53,29 @@ class ChainDemo(val app: App) : KtxScreen {
         var top = world.body {
             type = BodyType.StaticBody
             position.x = scaledWidth / 2
-            position.y = scaledHeight - wallWidth
-            box(scaledWidth - wallMargin, wallWidth)
+            position.y = scaledHeight - wallMargin
+            box(scaledWidth - wallWidth - wallMargin, wallWidth)
         }
 
         var bottom = world.body {
             type = BodyType.StaticBody
             position.x = scaledWidth / 2
-            position.y = 10f
-            box(scaledWidth - wallMargin, wallWidth)
+            position.y = wallMargin
+            box(scaledWidth - wallWidth - wallMargin, wallWidth)
         }
 
         var left = world.body {
             type = BodyType.StaticBody
-            position.x = 10f
+            position.x = wallMargin
             position.y = scaledHeight / 2
-            box(wallWidth, scaledHeight - wallMargin)
+            box(wallWidth, scaledHeight - wallWidth - wallMargin)
         }
 
         var right = world.body {
             type = BodyType.StaticBody
-            position.x = scaledWidth - 10f
+            position.x = scaledWidth - wallMargin
             position.y = scaledHeight / 2
-            box(wallWidth, scaledHeight - wallMargin)
+            box(wallWidth, scaledHeight - wallWidth - wallMargin)
         }
     }
 
@@ -93,7 +94,7 @@ class ChainDemo(val app: App) : KtxScreen {
         // to which we can connect the mouse joint
         groundBody = world.createBody(BodyDef())
 
-        val groundHeight = 25f
+        val groundHeight = wallMargin + wallWidth / 2
 
         val groundBodyDef = BodyDef()
         groundBodyDef.position.set(scaledWidth / 2f, groundHeight)
@@ -107,51 +108,65 @@ class ChainDemo(val app: App) : KtxScreen {
         ground.createFixture(edgeShape, groundHeight)
         edgeShape.dispose()
 
-        val shape = PolygonShape()
-        shape.setAsBox(3.0f, 1f)
+        val segmentShape = PolygonShape()
+        segmentShape.setAsBox(0.125f, 0.025f)
 
         val fd = FixtureDef()
-        fd.shape = shape
+        fd.shape = segmentShape
         fd.density = 20f
-        fd.friction = 0.2f
+        fd.friction = 0.0f
 
         val jointDef = RevoluteJointDef()
         jointDef.collideConnected = false
 
         val chainHeight = scaledHeight / 2
 
-        val bd = BodyDef()
-        bd.type = BodyType.DynamicBody
-        bd.position.set(centerX, chainHeight)
-        val body = world.createBody(bd)
-        body.createFixture(fd)
+        val firstBodyDef = BodyDef()
+        firstBodyDef.type = BodyType.DynamicBody
+        firstBodyDef.position.set(centerX, chainHeight)
+        val firstBody = world.createBody(firstBodyDef)
+        firstBody.createFixture(fd)
 
         val anchor = Vector2(centerX, chainHeight)
-        jointDef.initialize(ground, body, anchor)
+        jointDef.initialize(ground, firstBody, anchor)
         world.createJoint(jointDef)
-        var prevBody = body
+        var prevBody = firstBody
 
-        val chainStep = 3
+        val segmentStep = 1
 
-        for (i in centerX.toInt() + chainStep..centerX.toInt() + 80 step chainStep) {
-            val bd = BodyDef()
-            bd.type = BodyType.DynamicBody
-            bd.position.set(i.toFloat(), chainHeight)
-            val body = world.createBody(bd)
+        for (i in segmentStep..segmentStep * 30 step segmentStep) {
+            val posX = centerX + i * 0.1
+            val bodyDef = BodyDef()
+            bodyDef.type = BodyType.DynamicBody
+            bodyDef.position.set(posX.toFloat(), chainHeight + i * 0.1f)
+            val body = world.createBody(bodyDef)
             body.createFixture(fd)
 
-            val anchor = Vector2(i.toFloat(), chainHeight)
+            val anchor = Vector2(posX.toFloat(), chainHeight + i * 0.1f)
             jointDef.initialize(prevBody, body, anchor)
             world.createJoint(jointDef)
             prevBody = body
         }
 
-        shape.dispose()
+        segmentShape.dispose()
+    }
+
+    private val stepTime = 1f/45f
+    private var accumulator = 0f
+
+    private fun stepWorld() {
+        val delta = Gdx.graphics.deltaTime
+        accumulator += min(delta, 0.25f)
+
+        if (accumulator >= stepTime) {
+            accumulator -= stepTime
+            world.step(stepTime, 6, 2)
+        }
     }
 
     override fun render(delta: Float) {
         app.cam.update()
-        world.step(delta, 6, 2)
+        stepWorld()
 
         // next we clear the color buffer and set the camera
         // matrices

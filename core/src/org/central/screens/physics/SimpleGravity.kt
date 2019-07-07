@@ -10,24 +10,25 @@ import ktx.box2d.createWorld
 import org.central.App
 import ktx.app.KtxInputAdapter
 import ktx.box2d.body
+import kotlin.math.min
 
 
 class SimpleGravity(val app: App) : KtxScreen {
 
     private val debugRenderer = Box2DDebugRenderer()
     private val world = createWorld(gravity = Vector2(0f, -20f))
-    private val scaleDown = 0.25f
+    private val scaleDown = 0.01f
     private var scaledWidth = 0f
     private var scaledHeight = 0f
 
-    private val wallMargin = 20f
-    private val wallWidth = 10f
+    private val wallMargin = 1f
+    private val wallWidth = 0.5f
 
     fun createBody(x: Float, y: Float) {
         var body = world.body {
             type = BodyType.DynamicBody
             position.set(Vector2(x, scaledHeight - y))
-            box(width = 20f, height = 20f) {
+            box(width = 1f, height = 1f) {
                 density = 20f
                 restitution = 0.0f
             }
@@ -46,7 +47,7 @@ class SimpleGravity(val app: App) : KtxScreen {
         var ground = world.body {
             type = BodyType.StaticBody
             position.x = scaledWidth / 2
-            position.y = 10f
+            position.y = wallMargin
             box(scaledWidth - wallMargin, wallWidth)
         }
     }
@@ -60,9 +61,23 @@ class SimpleGravity(val app: App) : KtxScreen {
         initializeDimensions(app.width.toInt(), app.height.toInt())
     }
 
+    private val stepTime = 1f/45f
+    private var accumulator = 0f
+
+    private fun stepWorld() {
+        val delta = Gdx.graphics.deltaTime
+        accumulator += min(delta, 0.25f)
+
+        if (accumulator >= stepTime) {
+            accumulator -= stepTime
+            world.step(stepTime, 6, 2)
+        }
+    }
+
+
     override fun render(delta: Float) {
         app.cam.update()
-        world.step(delta, 3, 3)
+        stepWorld()
         debugRenderer.render(world, app.cam.combined)
     }
 
