@@ -3,24 +3,27 @@ package org.central.screens.physics
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import ktx.app.KtxScreen
 import org.central.App
 import ktx.app.KtxInputAdapter
-import ktx.box2d.body
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.box2d.*
 import com.badlogic.gdx.physics.box2d.QueryCallback
 import com.badlogic.gdx.physics.box2d.BodyDef
 import ktx.box2d.mouseJointWith
+import com.badlogic.gdx.physics.box2d.EdgeShape
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef
+import com.badlogic.gdx.physics.box2d.FixtureDef
+import com.badlogic.gdx.physics.box2d.PolygonShape
+import ktx.box2d.body
 
 
-class DraggableMouseJoint(val app: App) : KtxScreen {
+class ChainDemo(val app: App) : KtxScreen {
     private lateinit var debugRenderer: Box2DDebugRenderer
-    private var world = World(Vector2(0f, 0f), true)
+    private var world = World(Vector2(0f, -5f), true)
 
     private val scaleDown = 0.25f
     private var scaledWidth = 0f
@@ -29,9 +32,6 @@ class DraggableMouseJoint(val app: App) : KtxScreen {
     private val wallMargin = 20f
     private val wallWidth = 10f
 
-    // this is to make it so randomly generated bodies are always inside the walls
-    private val minDistance = wallMargin + wallWidth
-
     /** our mouse joint  */
     private var mouseJoint: MouseJoint? = null
 
@@ -39,28 +39,6 @@ class DraggableMouseJoint(val app: App) : KtxScreen {
     private var hitBody: Body? = null
 
     private lateinit var groundBody: Body
-
-    private fun createRectangle(x: Float, y: Float, width: Int, height: Int) {
-        var body = world.body {
-            type = BodyType.DynamicBody
-            position.set(Vector2(x, scaledHeight - y))
-            box(width = width.toFloat(), height = height.toFloat()) {
-                density = 20f
-                restitution = 0.0f
-            }
-        }
-    }
-
-    private fun createCircle(x: Float, y: Float, radius: Int) {
-        var body = world.body {
-            type = BodyType.DynamicBody
-            position.set(Vector2(x, scaledHeight - y))
-            circle(radius.toFloat()) {
-                density = 20f
-                restitution = 0.5f
-            }
-        }
-    }
 
     fun initializeDimensions(width: Int, height: Int) {
         scaledWidth = width * scaleDown
@@ -115,28 +93,60 @@ class DraggableMouseJoint(val app: App) : KtxScreen {
         // to which we can connect the mouse joint
         groundBody = world.createBody(BodyDef())
 
-        for (i in 0..15) {
-            val randomWidth = (MathUtils.random() * 20f).toInt() + 1
-            val randomHeight = (MathUtils.random() * 20f).toInt() + 1
+        val groundHeight = 25f
 
-            // in order to get the boxes inside of the borders - r.nextInt(high - low) + low;
+        val groundBodyDef = BodyDef()
+        groundBodyDef.position.set(scaledWidth / 2f, groundHeight)
+        val ground = world.createBody(groundBodyDef)
 
-            val randomX = MathUtils.random(scaledWidth - (minDistance - randomWidth / 2) * 2) + (minDistance - randomWidth / 2)
-            val randomY = MathUtils.random(scaledHeight - (minDistance - randomHeight / 2) * 2) + (minDistance - randomHeight / 2)
+        val edgeShape = EdgeShape()
 
-            createRectangle(randomX, randomY, randomWidth, randomHeight)
+        val centerX = scaledWidth / 2
+        edgeShape.set(Vector2(-centerX, 0f), Vector2(centerX, 0f))
+
+        ground.createFixture(edgeShape, groundHeight)
+        edgeShape.dispose()
+
+        val shape = PolygonShape()
+        shape.setAsBox(0.8f, 0.5f)
+
+        val fd = FixtureDef()
+        fd.shape = shape
+        fd.density = 20f
+        fd.friction = 5f
+
+        val jointDef = RevoluteJointDef()
+        jointDef.collideConnected = false
+
+        val chainHeight = scaledHeight / 2
+
+        val bd = BodyDef()
+        bd.type = BodyType.DynamicBody
+        bd.position.set(centerX, chainHeight)
+        val body = world.createBody(bd)
+        body.createFixture(fd)
+
+        val anchor = Vector2(centerX, chainHeight)
+        jointDef.initialize(ground, body, anchor)
+        world.createJoint(jointDef)
+        var prevBody = body
+
+        val chainStep = 1
+
+        for (i in centerX.toInt() + chainStep..centerX.toInt() + 78 step chainStep) {
+            val bd = BodyDef()
+            bd.type = BodyType.DynamicBody
+            bd.position.set(i.toFloat(), chainHeight)
+            val body = world.createBody(bd)
+            body.createFixture(fd)
+
+            val anchor = Vector2(i.toFloat(), chainHeight)
+            jointDef.initialize(prevBody, body, anchor)
+            world.createJoint(jointDef)
+            prevBody = body
         }
 
-        for (i in 0..10) {
-            val randomRadius = (MathUtils.random() * 15f).toInt() + 1
-
-            // in order to get the boxes inside of the borders - r.nextInt(high - low) + low;
-
-            val randomX = MathUtils.random(scaledWidth - (minDistance - randomRadius / 2) * 2) + (minDistance - randomRadius / 2)
-            val randomY = MathUtils.random(scaledHeight - (minDistance - randomRadius / 2) * 2) + (minDistance - randomRadius / 2)
-
-            createCircle(randomX, randomY, randomRadius)
-        }
+        shape.dispose()
     }
 
     override fun render(delta: Float) {
@@ -144,7 +154,7 @@ class DraggableMouseJoint(val app: App) : KtxScreen {
         world.step(1/5f, 6, 2)
         debugRenderer.render(world, app.cam.combined)
 
-        world.step(delta, 8, 3)
+        world.step(Gdx.app.graphics.deltaTime, 3, 3)
 
         // next we clear the color buffer and set the camera
         // matrices

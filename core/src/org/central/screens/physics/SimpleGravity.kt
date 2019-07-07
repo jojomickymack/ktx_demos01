@@ -20,6 +20,9 @@ class SimpleGravity(val app: App) : KtxScreen {
     private var scaledWidth = 0f
     private var scaledHeight = 0f
 
+    private val wallMargin = 20f
+    private val wallWidth = 10f
+
     fun createBody(x: Float, y: Float) {
         var body = world.body {
             type = BodyType.DynamicBody
@@ -44,7 +47,7 @@ class SimpleGravity(val app: App) : KtxScreen {
             type = BodyType.StaticBody
             position.x = scaledWidth / 2
             position.y = 10f
-            box(scaledWidth - 20f, 10f)
+            box(scaledWidth - wallMargin, wallWidth)
         }
     }
 

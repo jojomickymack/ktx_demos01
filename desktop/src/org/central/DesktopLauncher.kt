@@ -8,7 +8,7 @@ object DesktopLauncher {
     fun main(args: Array<String>) {
         val config = LwjglApplicationConfiguration()
         config.width = 720
-        config.height = 1570
+        config.height = 920
         LwjglApplication(App("menu"), config)
     }
 }

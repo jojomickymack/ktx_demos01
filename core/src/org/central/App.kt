@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.StretchViewport
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.central.input.GamepadCtl
 import com.central.input.InputCtl
@@ -19,8 +18,7 @@ import ktx.scene2d.Scene2DSkin
 import org.central.screens.Menu
 import org.central.screens.models.*
 import org.central.screens.opengl.*
-import org.central.screens.physics.DraggableMouseJoint
-import org.central.screens.physics.SimpleGravity
+import org.central.screens.physics.*
 import org.central.screens.shaders.*
 
 
@@ -116,6 +114,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         addScreen(Water(this))
         addScreen(SimpleGravity(this))
         addScreen(DraggableMouseJoint(this))
+        addScreen(ChainDemo(this))
 
         when (gameChoice) {
             "menu" -> setScreen<Menu>()
@@ -137,6 +136,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "water" -> setScreen<Water>()
             "gravity" -> setScreen<SimpleGravity>()
             "draggable-mousejoint" -> setScreen<DraggableMouseJoint>()
+            "chain" -> setScreen<ChainDemo>()
             else -> setScreen<Menu>()
         }
     }
