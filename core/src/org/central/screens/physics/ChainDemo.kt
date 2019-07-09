@@ -50,28 +50,28 @@ class ChainDemo(val app: App) : KtxScreen {
         app.cam.position.x = 0f + scaledWidth / 2
         app.cam.position.y = 0f + scaledHeight / 2
 
-        var top = world.body {
+        val top = world.body {
             type = BodyType.StaticBody
             position.x = scaledWidth / 2
             position.y = scaledHeight - wallMargin
             box(scaledWidth - wallWidth - wallMargin, wallWidth)
         }
 
-        var bottom = world.body {
+        val bottom = world.body {
             type = BodyType.StaticBody
             position.x = scaledWidth / 2
             position.y = wallMargin
             box(scaledWidth - wallWidth - wallMargin, wallWidth)
         }
 
-        var left = world.body {
+        val left = world.body {
             type = BodyType.StaticBody
             position.x = wallMargin
             position.y = scaledHeight / 2
             box(wallWidth, scaledHeight - wallWidth - wallMargin)
         }
 
-        var right = world.body {
+        val right = world.body {
             type = BodyType.StaticBody
             position.x = scaledWidth - wallMargin
             position.y = scaledHeight / 2

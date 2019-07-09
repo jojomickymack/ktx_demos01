@@ -113,8 +113,10 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         addScreen(Lightshafts(this))
         addScreen(Water(this))
         addScreen(SimpleGravity(this))
-        addScreen(DraggableMouseJoint(this))
+        addScreen(MouseJoint(this))
         addScreen(ChainDemo(this))
+        addScreen(LauncherDemo(this))
+        addScreen(OrbitDemo(this))
 
         when (gameChoice) {
             "menu" -> setScreen<Menu>()
@@ -135,8 +137,10 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "lightshafts" -> setScreen<Lightshafts>()
             "water" -> setScreen<Water>()
             "gravity" -> setScreen<SimpleGravity>()
-            "draggable-mousejoint" -> setScreen<DraggableMouseJoint>()
+            "mousejoints" -> setScreen<MouseJoint>()
             "chain" -> setScreen<ChainDemo>()
+            "launcher" -> setScreen<LauncherDemo>()
+            "orbit" -> setScreen<OrbitDemo>()
             else -> setScreen<Menu>()
         }
     }

@@ -25,7 +25,7 @@ class SimpleGravity(val app: App) : KtxScreen {
     private val wallWidth = 0.5f
 
     fun createBody(x: Float, y: Float) {
-        var body = world.body {
+        val body = world.body {
             type = BodyType.DynamicBody
             position.set(Vector2(x, scaledHeight - y))
             box(width = 1f, height = 1f) {
@@ -44,7 +44,7 @@ class SimpleGravity(val app: App) : KtxScreen {
         app.cam.position.x = 0f + scaledWidth / 2
         app.cam.position.y = 0f + scaledHeight / 2
 
-        var ground = world.body {
+        val ground = world.body {
             type = BodyType.StaticBody
             position.x = scaledWidth / 2
             position.y = wallMargin
@@ -73,7 +73,6 @@ class SimpleGravity(val app: App) : KtxScreen {
             world.step(stepTime, 6, 2)
         }
     }
-
 
     override fun render(delta: Float) {
         app.cam.update()

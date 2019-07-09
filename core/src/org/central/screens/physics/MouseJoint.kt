@@ -19,7 +19,7 @@ import ktx.box2d.mouseJointWith
 import kotlin.math.min
 
 
-class DraggableMouseJoint(val app: App) : KtxScreen {
+class MouseJoint(val app: App) : KtxScreen {
     private lateinit var debugRenderer: Box2DDebugRenderer
     private var world = World(Vector2(0f, 0f), true)
 
@@ -42,7 +42,7 @@ class DraggableMouseJoint(val app: App) : KtxScreen {
     private lateinit var groundBody: Body
 
     private fun createRectangle(x: Float, y: Float, width: Float, height: Float) {
-        var body = world.body {
+        val body = world.body {
             type = BodyType.DynamicBody
             position.set(Vector2(x, scaledHeight - y))
             box(width = width, height = height) {
@@ -53,7 +53,7 @@ class DraggableMouseJoint(val app: App) : KtxScreen {
     }
 
     private fun createCircle(x: Float, y: Float, radius: Float) {
-        var body = world.body {
+        val body = world.body {
             type = BodyType.DynamicBody
             position.set(Vector2(x, scaledHeight - y))
             circle(radius) {
@@ -72,28 +72,28 @@ class DraggableMouseJoint(val app: App) : KtxScreen {
         app.cam.position.x = 0f + scaledWidth / 2
         app.cam.position.y = 0f + scaledHeight / 2
 
-        var top = world.body {
+        val top = world.body {
             type = BodyType.StaticBody
             position.x = scaledWidth / 2
             position.y = scaledHeight - wallMargin
             box(scaledWidth - wallWidth - wallMargin, wallWidth)
         }
 
-        var bottom = world.body {
+        val bottom = world.body {
             type = BodyType.StaticBody
             position.x = scaledWidth / 2
             position.y = wallMargin
             box(scaledWidth - wallWidth - wallMargin, wallWidth)
         }
 
-        var left = world.body {
+        val left = world.body {
             type = BodyType.StaticBody
             position.x = wallMargin
             position.y = scaledHeight / 2
             box(wallWidth, scaledHeight - wallWidth - wallMargin)
         }
 
-        var right = world.body {
+        val right = world.body {
             type = BodyType.StaticBody
             position.x = scaledWidth - wallMargin
             position.y = scaledHeight / 2
