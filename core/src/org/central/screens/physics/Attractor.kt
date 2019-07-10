@@ -1,6 +1,7 @@
 package org.central.screens.physics
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.box2d.Body
@@ -15,9 +16,11 @@ import ktx.box2d.createWorld
 import ktx.box2d.mouseJointWith
 import org.central.App
 import kotlin.math.min
+import com.badlogic.gdx.utils.Timer
+import com.badlogic.gdx.utils.Timer.Task
 
 
-class OrbitDemo(val app: App) : KtxScreen {
+class Attractor(val app: App) : KtxScreen {
 
     private val debugRenderer = Box2DDebugRenderer()
     private val world = createWorld(gravity = Vector2(0f, 0f))
@@ -28,13 +31,15 @@ class OrbitDemo(val app: App) : KtxScreen {
     private val wallMargin = 0.5f
     private val wallWidth = 0.5f
 
+    // this is to make it so randomly generated bodies are always inside the walls
+    private val minDistance = wallMargin + wallWidth
+
     var planets = emptyList<Body>()
-    var orbitRadii = emptyList<Float>()
     lateinit var planet: Body
     lateinit var sun: Body
 
-    // the direction of the rotation is reversed if this is negative
-    val rotateVelocity = 2
+    var attract = true
+    val attractionVelocity = 2
 
     /** our mouse joint  */
     private var mouseJoint: MouseJoint? = null
@@ -43,6 +48,8 @@ class OrbitDemo(val app: App) : KtxScreen {
     private var hitBody: Body? = null
 
     private lateinit var groundBody: Body
+
+    private val timer = Timer()
 
     private fun createPlanet(x: Float, y: Float, radius: Float) {
         val newPlanet = world.body {
@@ -56,7 +63,32 @@ class OrbitDemo(val app: App) : KtxScreen {
         }
         newPlanet.linearVelocity = Vector2(5f, 0f)
         planets = planets + newPlanet
-        orbitRadii = orbitRadii + newPlanet.position.dst(sun.position)
+    }
+
+    private fun createRectangle(x: Float, y: Float, width: Float, height: Float) {
+        val body = world.body {
+            type = BodyDef.BodyType.DynamicBody
+            position.set(Vector2(x, scaledHeight - y))
+            box(width = width, height = height) {
+                density = 20f
+                restitution = 0.0f
+            }
+        }
+
+        planets = planets + body
+    }
+
+    private fun createCircle(x: Float, y: Float, radius: Float) {
+        val body = world.body {
+            type = BodyDef.BodyType.DynamicBody
+            position.set(Vector2(x, scaledHeight - y))
+            circle(radius) {
+                density = 20f
+                restitution = 0.5f
+            }
+        }
+
+        planets = planets + body
     }
 
     fun initializeDimensions(width: Int, height: Int) {
@@ -118,18 +150,34 @@ class OrbitDemo(val app: App) : KtxScreen {
             }
         }
 
-        planet = world.body {
-            type = BodyDef.BodyType.DynamicBody
-            position.set(Vector2(scaledWidth / 4, scaledHeight / 2))
-            circle(0.2f) {
-                density = 20f
-                restitution = 0.0f
-            }
-        }
-        planet.linearVelocity = Vector2(5f, 0f)
+        for (i in 0..15) {
+            val randomWidth = MathUtils.random() * 0.3f
+            val randomHeight = MathUtils.random() * 0.3f
 
-        planets = planets + planet
-        orbitRadii = orbitRadii + planet.position.dst(sun.position)
+            // in order to get the boxes inside of the borders - r.nextInt(high - low) + low;
+
+            val randomX = MathUtils.random(scaledWidth - (minDistance - randomWidth / 2) * 2) + (minDistance - randomWidth / 2)
+            val randomY = MathUtils.random(scaledHeight - (minDistance - randomHeight / 2) * 2) + (minDistance - randomHeight / 2)
+
+            createRectangle(randomX, randomY, randomWidth, randomHeight)
+        }
+
+        for (i in 0..10) {
+            val randomRadius = MathUtils.random() * 0.3f
+
+            // in order to get the boxes inside of the borders - r.nextInt(high - low) + low;
+
+            val randomX = MathUtils.random(scaledWidth - (minDistance - randomRadius / 2) * 2) + (minDistance - randomRadius / 2)
+            val randomY = MathUtils.random(scaledHeight - (minDistance - randomRadius / 2) * 2) + (minDistance - randomRadius / 2)
+
+            createCircle(randomX, randomY, randomRadius)
+        }
+
+        timer.scheduleTask(object : Task() {
+            override fun run() {
+                attract = !attract
+            }
+        }, 5f)
     }
 
     private val stepTime = 1f / 45f
@@ -145,35 +193,23 @@ class OrbitDemo(val app: App) : KtxScreen {
         }
     }
 
-    private fun rotatePlanetAroundSun(planet: Body, sun: Body, orbitRadius: Float) {
-        // subtract the two vectors to get the difference
-        val rotationVector = Vector2().set(planet.position).sub(sun.position).nor()
-        // this angle should be always 90
-        rotationVector.rotate(-90f)
-        rotationVector.nor()
-
-        // this scaling back needs to be done to prevent the planet from spiraling away because of centripetal force
-        val scaleBackVector = Vector2().set(planet.position).sub(sun.position).nor()
-
-        val distance = planet.position.dst(sun.position)
-        val distanceDifference = distance - orbitRadius
-        // divide the difference by the time step and make it negative
-        val scaleVal = distanceDifference / (1 / 45f) * -1f
-        scaleBackVector.scl(scaleVal)
-
-        // apply the rotation
-        val linearVelocityChangeVector = Vector2().set(rotationVector.x * rotateVelocity, rotationVector.y * rotateVelocity)
-        // compensate for centripetal force
-        linearVelocityChangeVector.add(scaleBackVector)
-        // if the sun is moving, the planets move too
-        linearVelocityChangeVector.add(sun.linearVelocity)
-        planet.linearVelocity = linearVelocityChangeVector
+    private fun rotatePlanetAroundSun(planet: Body, sun: Body) {
+        val deltaVector = if (attract) Vector2().set(sun.position).sub(planet.position).nor() else Vector2().set(planet.position).sub(sun.position).nor()
+        planet.linearVelocity = Vector2().set(deltaVector.x * attractionVelocity, deltaVector.y * attractionVelocity)
     }
 
     override fun render(delta: Float) {
+        if (timer.isEmpty) {
+            timer.scheduleTask(object : Task() {
+                override fun run() {
+                    attract = !attract
+                }
+            }, 5f)
+        }
+
         app.cam.update()
         planets.forEachIndexed { i, planet ->
-            rotatePlanetAroundSun(planet, sun, orbitRadii[i])
+            rotatePlanetAroundSun(planet, sun)
         }
         stepWorld()
         debugRenderer.render(world, app.cam.combined)

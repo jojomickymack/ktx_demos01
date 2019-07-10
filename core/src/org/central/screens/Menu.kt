@@ -38,6 +38,7 @@ class Menu(val app: App) : KtxScreen {
             textButton("chain") { onClick { app.setScreen<ChainDemo>() } }.cell(row = true)
             textButton("launcher") { onClick { app.setScreen<LauncherDemo>() } }.cell(row = true)
             textButton("orbit") { onClick { app.setScreen<OrbitDemo>() } }.cell(row = true)
+            textButton("attractor") { onClick { app.setScreen<Attractor>() } }.cell(row = true)
             textButton("negative") { onClick { app.setScreen<Negative>() } }.cell(row = true)
             textButton("grayscale") { onClick { app.setScreen<Grayscale>() } }.cell(row = true)
             textButton("sepia") { onClick { app.setScreen<Sepia>() } }.cell(row = true)

@@ -117,6 +117,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         addScreen(ChainDemo(this))
         addScreen(LauncherDemo(this))
         addScreen(OrbitDemo(this))
+        addScreen(Attractor(this))
 
         when (gameChoice) {
             "menu" -> setScreen<Menu>()
@@ -141,6 +142,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "chain" -> setScreen<ChainDemo>()
             "launcher" -> setScreen<LauncherDemo>()
             "orbit" -> setScreen<OrbitDemo>()
+            "attractor" -> setScreen<Attractor>()
             else -> setScreen<Menu>()
         }
     }
