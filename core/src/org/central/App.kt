@@ -16,6 +16,7 @@ import org.central.assets.Fonts.SDS_6x6
 import ktx.app.KtxGame
 import ktx.scene2d.Scene2DSkin
 import org.central.screens.Menu
+import org.central.screens.ktxactors.*
 import org.central.screens.models.*
 import org.central.screens.opengl.*
 import org.central.screens.physics.*
@@ -96,8 +97,20 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
 
         addScreen(Menu(this))
 
+        // ktxactors
+        addScreen(EventListeners(this))
+
+        // models
+        addScreen(ModelView(this))
+        addScreen(ModelTinted(this))
+        addScreen(ModelCustomShader(this))
+        addScreen(ModelAnimated(this))
+
+        // opengl
         addScreen(DepthTest(this))
         addScreen(TriangleDemo(this))
+
+        // shaders
         addScreen(Negative(this))
         addScreen(Grayscale(this))
         addScreen(Sepia(this))
@@ -106,12 +119,10 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         addScreen(Twist(this))
         addScreen(Blur(this))
         addScreen(NormalsLighting(this))
-        addScreen(ModelView(this))
-        addScreen(ModelTinted(this))
-        addScreen(ModelCustomShader(this))
-        addScreen(ModelAnimated(this))
         addScreen(Lightshafts(this))
         addScreen(Water(this))
+
+        // physics
         addScreen(SimpleGravity(this))
         addScreen(MouseJoint(this))
         addScreen(ChainDemo(this))
@@ -121,8 +132,21 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
 
         when (gameChoice) {
             "menu" -> setScreen<Menu>()
+
+            // ktxactors
+            "event-listeners" -> setScreen<EventListeners>()
+
+            // models
+            "model" -> setScreen<ModelView>()
+            "model-tinted" -> setScreen<ModelTinted>()
+            "model-custom-shader" -> setScreen<ModelCustomShader>()
+            "model-animated" -> setScreen<ModelAnimated>()
+
+            // opengl
             "depthtest" -> setScreen<DepthTest>()
             "triangle" -> setScreen<TriangleDemo>()
+
+            // shaders
             "negative" -> setScreen<Negative>()
             "grayscale" -> setScreen<Grayscale>()
             "sepia" -> setScreen<Sepia>()
@@ -131,18 +155,17 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "twist" -> setScreen<Twist>()
             "blur" -> setScreen<Blur>()
             "normals" -> setScreen<NormalsLighting>()
-            "model" -> setScreen<ModelView>()
-            "model-tinted" -> setScreen<ModelTinted>()
-            "model-custom-shader" -> setScreen<ModelCustomShader>()
-            "model-animated" -> setScreen<ModelAnimated>()
             "lightshafts" -> setScreen<Lightshafts>()
             "water" -> setScreen<Water>()
+
+            // physics
             "gravity" -> setScreen<SimpleGravity>()
             "mousejoints" -> setScreen<MouseJoint>()
             "chain" -> setScreen<ChainDemo>()
             "launcher" -> setScreen<LauncherDemo>()
             "orbit" -> setScreen<OrbitDemo>()
             "attractor" -> setScreen<Attractor>()
+
             else -> setScreen<Menu>()
         }
     }

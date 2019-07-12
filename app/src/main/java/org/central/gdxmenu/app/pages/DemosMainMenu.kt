@@ -15,7 +15,7 @@ class DemosMainMenu : Fragment() {
     private lateinit var myView: View
     private lateinit var demosMenuFragment: DemosMainMenu
     private lateinit var itemList: RecyclerView
-    private var demosList = mutableListOf("models", "opengl", "physics", "shaders")
+    private var demosList = mutableListOf("ktx-actors", "models", "opengl", "shaders", "box2d")
     private lateinit var adapter: MainDemosAdaptor
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

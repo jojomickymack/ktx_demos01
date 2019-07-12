@@ -18,10 +18,11 @@ class DemosMenuByType : Fragment() {
     private lateinit var myView: View
     private lateinit var demosMenuByTypeFragment: DemosMenuByType
     private lateinit var itemList: RecyclerView
-    private var modelDemosList = mutableListOf("model", "model-tinted", "model-custom-shader", "model-animated")
-    private var openglDemosList = mutableListOf("triangle", "depthtest")
-    private var physicsDemosList = mutableListOf("gravity", "draggable", "chain", "launcher", "orbit", "attractor")
-    private var shadersDemosList = mutableListOf("negative", "grayscale", "sepia", "vignette", "simplex", "twist", "blur", "normals", "lightshafts", "water")
+    private var ktxActorsList = mutableListOf("event-listeners")
+    private var modelList = mutableListOf("model", "model-tinted", "model-custom-shader", "model-animated")
+    private var openglList = mutableListOf("triangle", "depthtest")
+    private var box2dList = mutableListOf("gravity", "draggable", "chain", "launcher", "orbit", "attractor")
+    private var shadersList = mutableListOf("negative", "grayscale", "sepia", "vignette", "simplex", "twist", "blur", "normals", "lightshafts", "water")
 
     lateinit var adapter: MainDemosByTypeAdaptor
     var chosenType = ""
@@ -43,11 +44,12 @@ class DemosMenuByType : Fragment() {
 
         itemList = view.findViewById(R.id.demos_menu_item_list) as RecyclerView
         val demosList = when (chosenType) {
-            "models" -> modelDemosList
-            "opengl" -> openglDemosList
-            "physics" -> physicsDemosList
-            "shaders" -> shadersDemosList
-            else -> shadersDemosList
+            "ktx-actors" -> ktxActorsList
+            "models" -> modelList
+            "opengl" -> openglList
+            "box2d" -> box2dList
+            "shaders" -> shadersList
+            else -> shadersList
         }
         adapter = MainDemosByTypeAdaptor(this, demosList)
         itemList.adapter = adapter
