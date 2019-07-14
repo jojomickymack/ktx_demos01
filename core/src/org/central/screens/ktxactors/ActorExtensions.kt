@@ -63,6 +63,7 @@ class ActorExtensions(val app: App) : KtxScreen {
     private val margin = 15
     private val bomb = Bomb()
     private val explosionSound =  explode()
+    private var exploded = false
 
     private fun initializeDimensions(width: Int, height: Int) {
         app.stg.clear()
@@ -80,11 +81,6 @@ class ActorExtensions(val app: App) : KtxScreen {
         demoLabelWindow.setSize(demoLabel.width + margin, demoLabel.height + margin)
         demoLabelWindow.centerPosition()
         demoLabelWindow.y = bomb.y + bomb.height + margin * 4
-
-        bomb.onClick {
-            bomb.state = Bomb.States.exploding
-            explosionSound.play(0.25f)
-        }
     }
 
     override fun resize(width: Int, height: Int) {
@@ -94,6 +90,14 @@ class ActorExtensions(val app: App) : KtxScreen {
     override fun show() {
         initializeDimensions(app.width.toInt(), app.height.toInt())
         Gdx.input.inputProcessor = app.stg
+
+        bomb.onClick {
+            if (!exploded) {
+                exploded = true
+                bomb.state = Bomb.States.exploding
+                explosionSound.play(0.25f)
+            }
+        }
     }
 
     override fun render(delta: Float) {
