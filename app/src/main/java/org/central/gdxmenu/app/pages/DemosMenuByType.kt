@@ -18,7 +18,7 @@ class DemosMenuByType : Fragment() {
     private lateinit var myView: View
     private lateinit var demosMenuByTypeFragment: DemosMenuByType
     private lateinit var itemList: RecyclerView
-    private var ktxActorsList = mutableListOf("event-listeners")
+    private var ktxActorsList = mutableListOf("event-listeners", "actor-extensions")
     private var modelList = mutableListOf("model", "model-tinted", "model-custom-shader", "model-animated")
     private var openglList = mutableListOf("triangle", "depthtest")
     private var box2dList = mutableListOf("gravity", "draggable", "chain", "launcher", "orbit", "attractor")

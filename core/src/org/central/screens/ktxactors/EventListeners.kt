@@ -2,6 +2,7 @@ package org.central.screens.ktxactors
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Window
 import com.badlogic.gdx.utils.Align
@@ -15,58 +16,61 @@ import org.central.App
 
 class EventListeners(val app: App) : KtxScreen {
 
-    private lateinit var textWindow: Window
-    private lateinit var label: Label
-    private lateinit var screenLabel: Label
+    private lateinit var demoLabel: Label
+    private lateinit var eventWindow: Window
+    private lateinit var eventLabel: Label
 
     private val margin = 15f
+    private var oldText = ""
 
-    private fun changeLabelText(newText: String) {
-        label.setText(newText)
-        textWindow.setSize(label.width + margin, label.height + margin)
-        label.setAlignment(Align.center)
-        textWindow.centerPosition()
+    private fun changeEventLabelText(newText: String) {
+        if (newText != oldText) {
+            oldText = newText
+            eventLabel.setText(newText)
+            eventLabel.setAlignment(Align.center)
+            eventWindow.centerPosition()
+        }
     }
 
     private val inputProcessor = object : KtxInputAdapter {
 
         override fun keyDown(keycode: Int): Boolean {
-            changeLabelText("keyDown")
+            changeEventLabelText("keyDown")
             return false
         }
 
         override fun keyTyped(character: Char): Boolean {
-            changeLabelText("keyTyped")
+            changeEventLabelText("keyTyped")
             return false
         }
 
         override fun keyUp(keycode: Int): Boolean {
-            changeLabelText("keyUp")
+            changeEventLabelText("keyUp")
             return false
         }
 
         override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-            changeLabelText("mouseMoved")
+            changeEventLabelText("mouseMoved")
             return false
         }
 
         override fun scrolled(amount: Int): Boolean {
-            changeLabelText("scrolled")
+            changeEventLabelText("scrolled")
             return false
         }
 
         override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-            changeLabelText("touchDown")
+            changeEventLabelText("touchDown")
             return false
         }
 
         override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-            changeLabelText("touchUp")
+            changeEventLabelText("touchUp")
             return false
         }
 
         override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-            changeLabelText("touchDragged")
+            changeEventLabelText("touchDragged")
             return false
         }
     }
@@ -74,24 +78,25 @@ class EventListeners(val app: App) : KtxScreen {
     private fun initializeDimensions(width: Int, height: Int) {
         app.stg.clear()
 
-        textWindow = window("") {
-            label = label("nothing")
+        val demoLabelWindow = window("") {
+            demoLabel = label("last event")
         }
 
-        val titleWindow = window("") {
-            screenLabel = label("last event")
+        eventWindow = window("") {
+            eventLabel = label("nothing")
         }
 
-        app.stg += titleWindow
-        app.stg += textWindow
+        app.stg += demoLabelWindow
+        app.stg += eventWindow
 
-        textWindow += label
+        eventLabel.setText("nothing")
+        eventWindow.setSize(width / 2 - margin * 2, demoLabel.height + margin)
+        eventLabel.setAlignment(Align.center)
+        eventWindow.centerPosition()
 
-        changeLabelText("nothing")
-
-        titleWindow.setSize(screenLabel.width + margin, screenLabel.height + margin)
-        titleWindow.centerPosition()
-        titleWindow.y = textWindow.y + label.height + margin * 4
+        demoLabelWindow.setSize(demoLabel.width + margin * 2, demoLabel.height + margin)
+        demoLabelWindow.centerPosition()
+        demoLabelWindow.y = eventWindow.y + eventLabel.height + margin * 4
     }
 
     override fun resize(width: Int, height: Int) {
@@ -104,11 +109,13 @@ class EventListeners(val app: App) : KtxScreen {
     }
 
     override fun render(delta: Float) {
+        Gdx.gl.glClearColor(0.6f, 0.6f, 0.6f, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
         app.stg.act()
         app.stg.draw()
     }
 
     override fun dispose() {
-        
+
     }
 }

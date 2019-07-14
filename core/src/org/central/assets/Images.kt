@@ -6,11 +6,6 @@ import ktx.assets.getAsset
 import ktx.assets.load
 
 enum class Images {
-    back_button,
-    introBgTex,
-    introLogoTex,
-    titleBgTex,
-    titleLogoTex,
     menuBgTex,
     badlogic,
     funny_face,
@@ -19,7 +14,8 @@ enum class Images {
     slime,
     mask,
     small_window_wall,
-    mountains;
+    mountains,
+    bomb;
 
 
     val path = "images/${name}.png"

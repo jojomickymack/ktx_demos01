@@ -6,7 +6,8 @@ import ktx.assets.getAsset
 import ktx.assets.load
 
 enum class Sounds {
-    noise;
+    noise,
+    explode;
 
     val path = "sounds/${name}.ogg"
     fun load() = manager.load<Sound>(path)
