@@ -48,6 +48,7 @@ class Menu(val app: App) : KtxScreen {
             // ktxactors
             textButton("event-listeners") { onClick { app.setScreen<EventListeners>() } }.cell(row = true)
             textButton("actor-extensions") { onClick { app.setScreen<ActorExtensions>() } }.cell(row = true)
+            textButton("actor-sequences") { onClick { app.setScreen<Sequences>() } }.cell(row = true)
 
             // opengl
             textButton("depth test") { onClick { app.setScreen<DepthTest>() } }.cell(row = true)

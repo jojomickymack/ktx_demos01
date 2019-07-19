@@ -15,7 +15,8 @@ enum class Images {
     mask,
     small_window_wall,
     mountains,
-    bomb;
+    bomb,
+    dummy;
 
 
     val path = "images/${name}.png"

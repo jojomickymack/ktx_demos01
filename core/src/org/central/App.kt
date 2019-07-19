@@ -100,6 +100,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         // ktxactors
         addScreen(EventListeners(this))
         addScreen(ActorExtensions(this))
+        addScreen(Sequences(this))
 
         // models
         addScreen(ModelView(this))
@@ -137,6 +138,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             // ktxactors
             "event-listeners" -> setScreen<EventListeners>()
             "actor-extensions" -> setScreen<ActorExtensions>()
+            "actor-sequences" -> setScreen<Sequences>()
 
             // models
             "model" -> setScreen<ModelView>()
