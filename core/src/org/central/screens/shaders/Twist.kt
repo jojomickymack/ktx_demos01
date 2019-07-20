@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.GdxRuntimeException
 import org.central.App
 import org.central.assets.Images.badlogic
-import org.central.assets.Images.slime
-import org.central.assets.Images.mask
 
 
 class Twist(val app: App) : KtxScreen {

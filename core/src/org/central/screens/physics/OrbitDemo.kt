@@ -1,5 +1,6 @@
 package org.central.screens.physics
 
+import kotlin.math.min
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
@@ -13,8 +14,8 @@ import ktx.app.KtxScreen
 import ktx.box2d.body
 import ktx.box2d.createWorld
 import ktx.box2d.mouseJointWith
+import ktx.collections.gdxListOf
 import org.central.App
-import kotlin.math.min
 
 
 class OrbitDemo(val app: App) : KtxScreen {
@@ -28,13 +29,15 @@ class OrbitDemo(val app: App) : KtxScreen {
     private val wallMargin = 0.5f
     private val wallWidth = 0.5f
 
-    var planets = emptyList<Body>()
-    var orbitRadii = emptyList<Float>()
-    lateinit var planet: Body
-    lateinit var sun: Body
+    private var planets = gdxListOf<Body>()
+    private var orbitRadii = listOf<Float>()
+    private lateinit var planet: Body
+    private lateinit var sun: Body
+    private val sunRadius = 0.4f
+    private val planetRadius = 0.2f
 
     // the direction of the rotation is reversed if this is negative
-    val rotateVelocity = 2
+    private val rotateVelocity = 2
 
     /** our mouse joint  */
     private var mouseJoint: MouseJoint? = null
@@ -55,8 +58,11 @@ class OrbitDemo(val app: App) : KtxScreen {
             }
         }
         newPlanet.linearVelocity = Vector2(5f, 0f)
-        planets = planets + newPlanet
-        orbitRadii = orbitRadii + newPlanet.position.dst(sun.position)
+        planets += newPlanet
+        val orbitRadius = newPlanet.position.dst(sun.position)
+
+        // if the planet is touching the sun while orbiting it messes everything up
+        orbitRadii = orbitRadii + if (orbitRadius < sunRadius + planetRadius) sunRadius + planetRadius + 0.01f else orbitRadius
     }
 
     fun initializeDimensions(width: Int, height: Int) {
@@ -112,7 +118,7 @@ class OrbitDemo(val app: App) : KtxScreen {
         sun = world.body {
             type = BodyDef.BodyType.DynamicBody
             position.set(Vector2(scaledWidth / 2, scaledHeight / 2))
-            circle(0.4f) {
+            circle(sunRadius) {
                 density = 20f
                 restitution = 0.0f
             }
@@ -121,14 +127,14 @@ class OrbitDemo(val app: App) : KtxScreen {
         planet = world.body {
             type = BodyDef.BodyType.DynamicBody
             position.set(Vector2(scaledWidth / 4, scaledHeight / 2))
-            circle(0.2f) {
+            circle(planetRadius) {
                 density = 20f
                 restitution = 0.0f
             }
         }
         planet.linearVelocity = Vector2(5f, 0f)
 
-        planets = planets + planet
+        planets += planet
         orbitRadii = orbitRadii + planet.position.dst(sun.position)
     }
 
@@ -181,7 +187,7 @@ class OrbitDemo(val app: App) : KtxScreen {
 
     /** we instantiate this vector and the callback here so we don't irritate the GC  */
     var testPoint = Vector3()
-    var callback: QueryCallback = QueryCallback { fixture ->
+    var callback = QueryCallback { fixture ->
         // if the hit fixture's body is the ground body
         // we ignore it
         if (fixture.body === groundBody) return@QueryCallback true
@@ -190,9 +196,8 @@ class OrbitDemo(val app: App) : KtxScreen {
         // we report it
         if (fixture.testPoint(testPoint.x, testPoint.y)) {
             hitBody = fixture.body
-            false
-        } else
-            true
+            return@QueryCallback false
+        } else return@QueryCallback true
     }
 
     private val inputProcessor = object : KtxInputAdapter {

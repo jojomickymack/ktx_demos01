@@ -71,20 +71,12 @@ class Sequences(val app: App) : KtxScreen {
     private val dummy = Dummy()
 
     private fun initializeDimensions(width: Int, height: Int) {
-
-    }
-
-    override fun resize(width: Int, height: Int) {
-        initializeDimensions(width, height)
-    }
-
-    override fun show() {
-        initializeDimensions(app.width.toInt(), app.height.toInt())
-        Gdx.input.inputProcessor = app.stg
-
         app.stg.clear()
 
-        dummy.setSize(app.width / 6, app.width / 6)
+        // this is a simple hack to avoid images being stretched
+        val smallerDimension = if (app.portrait) width else height
+
+        dummy.setSize(smallerDimension / 6f, smallerDimension / 6f)
         dummy.alpha = 0f
         dummy.setPosition(0f, app.stg.height / 2 - dummy.height / 2)
 
@@ -108,6 +100,17 @@ class Sequences(val app: App) : KtxScreen {
         )
 
         app.stg += dummy
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        initializeDimensions(width, height)
+    }
+
+    override fun show() {
+        initializeDimensions(app.width.toInt(), app.height.toInt())
+        // I was thinking of making the actor walk to different places on the screen with this by adding moveTo actions to it
+        // Gdx.input.inputProcessor = app.hudStg
     }
 
     override fun render(delta: Float) {

@@ -32,6 +32,7 @@ class Bomb : Actor() {
     private val exploding = Animation(0.15f, regions[1], regions[2], regions[3], regions[4], regions[5], regions[6],
             regions[7], regions[8], regions[9], regions[10], regions[12], regions[12])
 
+    var lastState = States.idle
     var state = States.idle
 
     init {
@@ -39,6 +40,8 @@ class Bomb : Actor() {
     }
 
     override fun act(delta: Float) {
+        if (this.lastState != this.state) this.stateTime = 0f
+
         var deltaTime = delta
         if (deltaTime == 0f) return
 
@@ -50,6 +53,8 @@ class Bomb : Actor() {
             States.idle -> this.idle.getKeyFrame(this.stateTime)
             States.exploding -> this.exploding.getKeyFrame(this.stateTime)
         }
+
+        this.lastState = this.state
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
@@ -75,7 +80,10 @@ class ActorExtensions(val app: App) : KtxScreen {
         app.stg += demoLabelWindow
         app.stg += bomb
 
-        bomb.setSize(width.toFloat() / 6, width.toFloat() / 6)
+        // this is a simple hack to avoid images being stretched
+        val smallerDimension = if (app.portrait) width else height
+
+        bomb.setSize(smallerDimension / 6f, smallerDimension / 6f)
         bomb.centerPosition()
 
         demoLabelWindow.setSize(demoLabel.width + margin, demoLabel.height + margin)
@@ -84,6 +92,7 @@ class ActorExtensions(val app: App) : KtxScreen {
     }
 
     override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
         initializeDimensions(width, height)
     }
 

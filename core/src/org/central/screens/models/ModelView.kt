@@ -42,11 +42,9 @@ class ModelView(val app: App) : KtxScreen {
 
     var loading = false
 
-    override fun show() {
-        modelStgModelBatch = ModelBatch()
-
-        modelStgCam = PerspectiveCamera(10f, app.width, app.height)
-        modelStgView = StretchViewport(360f, 785f, modelStgCam)
+    private fun initializeDimensions(width: Int, height: Int) {
+        modelStgCam = PerspectiveCamera(10f, width.toFloat(), height.toFloat())
+        modelStgView = if (app.portrait) StretchViewport(app.smallerDimension, app.largerDimension, modelStgCam) else StretchViewport(app.largerDimension, app.smallerDimension, modelStgCam)
         modelStg = Stage(modelStgView)
 
         environment = Environment()
@@ -60,6 +58,16 @@ class ModelView(val app: App) : KtxScreen {
         modelStgCam.near = 0.7f
         modelStgCam.far = 100f
         modelStgCam.update()
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        initializeDimensions(width, height)
+    }
+
+    override fun show() {
+        initializeDimensions(app.width.toInt(), app.height.toInt())
+        modelStgModelBatch = ModelBatch()
 
         camController = CameraInputController(modelStgCam)
         Gdx.input.inputProcessor = camController

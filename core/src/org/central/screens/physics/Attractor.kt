@@ -1,5 +1,6 @@
 package org.central.screens.physics
 
+import kotlin.math.min
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
@@ -9,15 +10,16 @@ import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.QueryCallback
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint
+import com.badlogic.gdx.utils.Timer
+import com.badlogic.gdx.utils.Timer.Task
 import ktx.app.KtxInputAdapter
 import ktx.app.KtxScreen
 import ktx.box2d.body
 import ktx.box2d.createWorld
 import ktx.box2d.mouseJointWith
+import ktx.collections.gdxListOf
 import org.central.App
-import kotlin.math.min
-import com.badlogic.gdx.utils.Timer
-import com.badlogic.gdx.utils.Timer.Task
+import kotlin.math.roundToInt
 
 
 class Attractor(val app: App) : KtxScreen {
@@ -34,12 +36,11 @@ class Attractor(val app: App) : KtxScreen {
     // this is to make it so randomly generated bodies are always inside the walls
     private val minDistance = wallMargin + wallWidth
 
-    var planets = emptyList<Body>()
-    lateinit var planet: Body
-    lateinit var sun: Body
+    private var bodyList = gdxListOf<Body>()
+    private lateinit var sun: Body
 
-    var attract = true
-    val attractionVelocity = 2
+    private var attract = true
+    private val attractionVelocity = 2
 
     /** our mouse joint  */
     private var mouseJoint: MouseJoint? = null
@@ -51,20 +52,6 @@ class Attractor(val app: App) : KtxScreen {
 
     private val timer = Timer()
 
-    private fun createPlanet(x: Float, y: Float, radius: Float) {
-        val newPlanet = world.body {
-            type = BodyDef.BodyType.DynamicBody
-            position.set(Vector2(x, scaledHeight - y))
-            angularVelocity = 5f
-            circle(radius) {
-                density = 20f
-                restitution = 0.5f
-            }
-        }
-        newPlanet.linearVelocity = Vector2(5f, 0f)
-        planets = planets + newPlanet
-    }
-
     private fun createRectangle(x: Float, y: Float, width: Float, height: Float) {
         val body = world.body {
             type = BodyDef.BodyType.DynamicBody
@@ -75,7 +62,7 @@ class Attractor(val app: App) : KtxScreen {
             }
         }
 
-        planets = planets + body
+        bodyList += body
     }
 
     private fun createCircle(x: Float, y: Float, radius: Float) {
@@ -88,7 +75,15 @@ class Attractor(val app: App) : KtxScreen {
             }
         }
 
-        planets = planets + body
+        bodyList += body
+    }
+
+    private fun createRandomBody(locationX: Float, locationY: Float, width: Float, height: Float) {
+        when (MathUtils.random().roundToInt()) {
+            0 -> createRectangle(locationX, locationY, width, height)
+            1 -> createCircle(locationX, locationY, width)
+        }
+
     }
 
     fun initializeDimensions(width: Int, height: Int) {
@@ -150,27 +145,14 @@ class Attractor(val app: App) : KtxScreen {
             }
         }
 
-        for (i in 0..15) {
+        for (i in 0..25) {
+            // in order to get the boxes inside of the borders - r.nextInt(high - low) + low;
             val randomWidth = MathUtils.random() * 0.3f
             val randomHeight = MathUtils.random() * 0.3f
 
-            // in order to get the boxes inside of the borders - r.nextInt(high - low) + low;
-
             val randomX = MathUtils.random(scaledWidth - (minDistance - randomWidth / 2) * 2) + (minDistance - randomWidth / 2)
             val randomY = MathUtils.random(scaledHeight - (minDistance - randomHeight / 2) * 2) + (minDistance - randomHeight / 2)
-
-            createRectangle(randomX, randomY, randomWidth, randomHeight)
-        }
-
-        for (i in 0..10) {
-            val randomRadius = MathUtils.random() * 0.3f
-
-            // in order to get the boxes inside of the borders - r.nextInt(high - low) + low;
-
-            val randomX = MathUtils.random(scaledWidth - (minDistance - randomRadius / 2) * 2) + (minDistance - randomRadius / 2)
-            val randomY = MathUtils.random(scaledHeight - (minDistance - randomRadius / 2) * 2) + (minDistance - randomRadius / 2)
-
-            createCircle(randomX, randomY, randomRadius)
+            createRandomBody(randomX, randomY, randomWidth, randomHeight)
         }
 
         timer.scheduleTask(object : Task() {
@@ -208,7 +190,7 @@ class Attractor(val app: App) : KtxScreen {
         }
 
         app.cam.update()
-        planets.forEachIndexed { i, planet ->
+        bodyList.forEachIndexed { i, planet ->
             rotatePlanetAroundSun(planet, sun)
         }
         stepWorld()
@@ -217,7 +199,7 @@ class Attractor(val app: App) : KtxScreen {
 
     /** we instantiate this vector and the callback here so we don't irritate the GC  */
     var testPoint = Vector3()
-    var callback: QueryCallback = QueryCallback { fixture ->
+    var callback = QueryCallback { fixture ->
         // if the hit fixture's body is the ground body
         // we ignore it
         if (fixture.body === groundBody) return@QueryCallback true
@@ -226,9 +208,8 @@ class Attractor(val app: App) : KtxScreen {
         // we report it
         if (fixture.testPoint(testPoint.x, testPoint.y)) {
             hitBody = fixture.body
-            false
-        } else
-            true
+            return@QueryCallback false
+        } else return@QueryCallback true
     }
 
     private val inputProcessor = object : KtxInputAdapter {
@@ -252,7 +233,11 @@ class Attractor(val app: App) : KtxScreen {
                 }
                 hitBody?.isAwake = true
             } else {
-                createPlanet(screenX * scaleDown, screenY * scaleDown, 0.2f)
+                for (i in 0..5) {
+                    val randomWidth = MathUtils.random() * 0.3f
+                    val randomHeight = MathUtils.random() * 0.3f
+                    createRandomBody(screenX * scaleDown, screenY * scaleDown, randomWidth, randomHeight)
+                }
             }
             return false
         }

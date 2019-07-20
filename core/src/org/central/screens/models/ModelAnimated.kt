@@ -31,8 +31,6 @@ class ModelAnimated(val app: App) : KtxScreen {
 
     private lateinit var camController: CameraInputController
 
-    private lateinit var controller: AnimationController
-
     private lateinit var assets: AssetManager
     private lateinit var environment: Environment
 
@@ -42,13 +40,10 @@ class ModelAnimated(val app: App) : KtxScreen {
     private var controllers = GdxArray<AnimationController>()
     private var loading = false
 
-    override fun show() {
+    private fun initializeDimensions(width: Int, height: Int) {
+        modelStgCam = PerspectiveCamera(10f, width.toFloat(), height.toFloat())
 
-        modelStgModelBatch = ModelBatch()
-
-        modelStgCam = PerspectiveCamera(10f, app.width, app.height)
-
-        modelStgView = StretchViewport(1024f, 768f, modelStgCam)
+        modelStgView = if (app.portrait) StretchViewport(app.smallerDimension, app.largerDimension, modelStgCam) else StretchViewport(app.largerDimension, app.smallerDimension, modelStgCam)
         modelStg = Stage(modelStgView)
 
         environment = Environment()
@@ -60,7 +55,17 @@ class ModelAnimated(val app: App) : KtxScreen {
         modelStgCam.near = 0.2f
         modelStgCam.far = 300f
         modelStgCam.update()
+    }
 
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        initializeDimensions(width, height)
+    }
+
+    override fun show() {
+        initializeDimensions(app.width.toInt(), app.height.toInt())
+
+        modelStgModelBatch = ModelBatch()
         camController = CameraInputController(modelStgCam)
         Gdx.input.inputProcessor = camController
 

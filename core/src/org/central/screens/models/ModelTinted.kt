@@ -44,17 +44,10 @@ class ModelTinted(val app: App) : KtxScreen {
 
     var loading = false
 
-    override fun show() {
+    private fun initializeDimensions(width: Int, height: Int) {
+        modelStgCam = PerspectiveCamera(10f, width.toFloat(), height.toFloat())
 
-        config = DefaultShader.Config()
-        config.numDirectionalLights = 1
-
-        config.fragmentShader = Gdx.files.internal("shaders/tweaked_default.frag").readString()
-
-        modelStgModelBatch = ModelBatch(DefaultShaderProvider(config))
-
-        modelStgCam = PerspectiveCamera(10f, app.width, app.height)
-        modelStgView = StretchViewport(360f, 785f, modelStgCam)
+        modelStgView = if (app.portrait) StretchViewport(app.smallerDimension, app.largerDimension, modelStgCam) else StretchViewport(app.largerDimension, app.smallerDimension, modelStgCam)
         modelStg = Stage(modelStgView)
 
         environment = Environment()
@@ -66,6 +59,25 @@ class ModelTinted(val app: App) : KtxScreen {
         modelStgCam.near = 0.7f
         modelStgCam.far = 100f
         modelStgCam.update()
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        initializeDimensions(width, height)
+    }
+
+    override fun show() {
+        initializeDimensions(app.width.toInt(), app.height.toInt())
+
+        // default shader has all kinds of uniforms and attributes that you can mess with. The way to
+        // change individual settings and parameters is by using the config, changing it, and instantiating
+        // the DefaultShaderProvider with the config in its constructor
+        config = DefaultShader.Config()
+        config.numDirectionalLights = 1
+
+        config.fragmentShader = Gdx.files.internal("shaders/tweaked_default.frag").readString()
+
+        modelStgModelBatch = ModelBatch(DefaultShaderProvider(config))
 
         camController = CameraInputController(modelStgCam)
         Gdx.input.inputProcessor = camController

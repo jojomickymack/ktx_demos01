@@ -1,21 +1,17 @@
 package org.central.screens.physics
 
+import kotlin.math.min
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
-import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef
-import com.badlogic.gdx.physics.box2d.joints.PrismaticJointDef
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef
 import ktx.app.KtxInputAdapter
 import ktx.app.KtxScreen
 import ktx.box2d.createWorld
-import org.central.App
 import ktx.box2d.body
-import ktx.box2d.box
-import kotlin.math.min
+import org.central.App
 
 
 class LauncherDemo(val app: App) : KtxScreen {

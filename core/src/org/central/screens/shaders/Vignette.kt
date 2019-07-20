@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import ktx.app.KtxScreen
 import org.central.App
 import org.central.assets.Images.badlogic
-import kotlin.system.exitProcess
 
 
 class Vignette(val app: App) : KtxScreen {

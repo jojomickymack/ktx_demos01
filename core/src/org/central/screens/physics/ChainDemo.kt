@@ -1,25 +1,25 @@
 package org.central.screens.physics
 
+import kotlin.math.min
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
-import ktx.app.KtxScreen
-import org.central.App
-import ktx.app.KtxInputAdapter
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.box2d.*
 import com.badlogic.gdx.physics.box2d.QueryCallback
 import com.badlogic.gdx.physics.box2d.BodyDef
-import ktx.box2d.mouseJointWith
 import com.badlogic.gdx.physics.box2d.EdgeShape
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef
 import com.badlogic.gdx.physics.box2d.FixtureDef
 import com.badlogic.gdx.physics.box2d.PolygonShape
+import ktx.app.KtxScreen
+import ktx.app.KtxInputAdapter
 import ktx.box2d.body
-import kotlin.math.min
+import ktx.box2d.mouseJointWith
+import org.central.App
 
 
 class ChainDemo(val app: App) : KtxScreen {
@@ -177,7 +177,7 @@ class ChainDemo(val app: App) : KtxScreen {
 
     /** we instantiate this vector and the callback here so we don't irritate the GC  */
     var testPoint = Vector3()
-    var callback: QueryCallback = QueryCallback { fixture ->
+    var callback = QueryCallback { fixture ->
         // if the hit fixture's body is the ground body
         // we ignore it
         if (fixture.body === groundBody) return@QueryCallback true
@@ -186,9 +186,8 @@ class ChainDemo(val app: App) : KtxScreen {
         // we report it
         if (fixture.testPoint(testPoint.x, testPoint.y)) {
             hitBody = fixture.body
-            false
-        } else
-            true
+            return@QueryCallback false
+        } else return@QueryCallback true
     }
 
     private val inputProcessor = object : KtxInputAdapter {

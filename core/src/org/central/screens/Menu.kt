@@ -68,7 +68,7 @@ class Menu(val app: App) : KtxScreen {
             textButton("launcher") { onClick { app.setScreen<LauncherDemo>() } }.cell(row = true)
             textButton("orbit") { onClick { app.setScreen<OrbitDemo>() } }.cell(row = true)
             textButton("attractor") { onClick { app.setScreen<Attractor>() } }.cell(row = true)
-
+*/
             // shaders
             textButton("negative") { onClick { app.setScreen<Negative>() } }.cell(row = true)
             textButton("grayscale") { onClick { app.setScreen<Grayscale>() } }.cell(row = true)
@@ -79,7 +79,7 @@ class Menu(val app: App) : KtxScreen {
             textButton("twist") { onClick { app.setScreen<Twist>() } }.cell(row = true)
             textButton("lightshafts") { onClick { app.setScreen<Lightshafts>() } }.cell(row = true)
             textButton("water") { onClick { app.setScreen<Water>() } }.cell(row = true)
-*/
+
         }
 
         Gdx.input.inputProcessor = app.hudStg

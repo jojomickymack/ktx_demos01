@@ -32,6 +32,10 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
 
     var width = 0f
     var height = 0f
+    var portrait = true
+
+    val smallerDimension = 360f
+    val largerDimension = 785f
 
     private lateinit var font: BitmapFont
     private val fontSize = 5f
@@ -66,15 +70,14 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         this.sb = SpriteBatch()
         this.hudSb = SpriteBatch()
 
-        val stretchWidth = 360f
-        val stretchHeight = 785f
+        this.portrait = width < height
 
         this.cam = OrthographicCamera(this.width, this.height)
-        this.view = StretchViewport(stretchWidth, stretchHeight, this.cam)
+        this.view = if (portrait) StretchViewport(smallerDimension, largerDimension, this.cam) else StretchViewport(largerDimension, smallerDimension, this.cam)
         this.stg = Stage(this.view, this.sb)
 
         this.hudCam = OrthographicCamera(this.width, this.height)
-        this.hudView = StretchViewport(stretchWidth, stretchHeight, this.hudCam)
+        this.hudView = if (portrait) StretchViewport(smallerDimension, largerDimension, this.hudCam) else StretchViewport(largerDimension, smallerDimension, this.hudCam)
         this.hudStg = Stage(this.hudView, this.hudSb)
 
         ic = InputCtl(this)
@@ -189,6 +192,11 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
     override fun resize(width: Int, height: Int) {
         this.width = width.toFloat()
         this.height = height.toFloat()
+
+        // this is a simple hack to avoid images being stretched
+        this.portrait = width < height
+        this.view = if (portrait) StretchViewport(smallerDimension, largerDimension, this.cam) else StretchViewport(largerDimension, smallerDimension, this.cam)
+        this.hudView = if (portrait) StretchViewport(smallerDimension, largerDimension, this.hudCam) else StretchViewport(largerDimension, smallerDimension, this.hudCam)
     }
 
     fun drawFps() {

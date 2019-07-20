@@ -131,11 +131,10 @@ class ModelCustomShader(val app: App) : KtxScreen {
 
     var loading = false
 
-    override fun show() {
-        modelStgModelBatch = ModelBatch()
+    private fun initializeDimensions(width: Int, height: Int) {
+        modelStgCam = PerspectiveCamera(10f, width.toFloat(), height.toFloat())
 
-        modelStgCam = PerspectiveCamera(10f, app.width, app.height)
-        modelStgView = StretchViewport(360f, 785f, modelStgCam)
+        modelStgView = if (app.portrait) StretchViewport(app.smallerDimension, app.largerDimension, modelStgCam) else StretchViewport(app.largerDimension, app.smallerDimension, modelStgCam)
         modelStg = Stage(modelStgView)
 
         modelStgCam.position.set(0f, 0f, 20f)
@@ -147,6 +146,11 @@ class ModelCustomShader(val app: App) : KtxScreen {
         environment = Environment()
         directionalLight = DirectionalLight().set(1f, 1f, 1f, lightX, -20f, -50f)
         environment.add(directionalLight)
+    }
+
+    override fun show() {
+        initializeDimensions(app.width.toInt(), app.height.toInt())
+        modelStgModelBatch = ModelBatch()
 
         camController = CameraInputController(modelStgCam)
         Gdx.input.inputProcessor = camController

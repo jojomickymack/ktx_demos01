@@ -6,8 +6,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Window
 import com.badlogic.gdx.utils.Align
-import ktx.actors.centerPosition
-import ktx.actors.plusAssign
+import ktx.actors.*
 import ktx.app.KtxInputAdapter
 import ktx.app.KtxScreen
 import ktx.scene2d.*
@@ -26,7 +25,7 @@ class EventListeners(val app: App) : KtxScreen {
     private fun changeEventLabelText(newText: String) {
         if (newText != oldText) {
             oldText = newText
-            eventLabel.setText(newText)
+            eventLabel.txt = newText
             eventLabel.setAlignment(Align.center)
             eventWindow.centerPosition()
         }
@@ -89,8 +88,10 @@ class EventListeners(val app: App) : KtxScreen {
         app.stg += demoLabelWindow
         app.stg += eventWindow
 
-        eventLabel.setText("nothing")
-        eventWindow.setSize(width / 2 - margin * 2, demoLabel.height + margin)
+        // this is a simple hack to avoid images being stretched
+        val smallerDimension = if (app.portrait) width else height
+
+        eventWindow.setSize(smallerDimension / 2 - margin * 2, demoLabel.height + margin)
         eventLabel.setAlignment(Align.center)
         eventWindow.centerPosition()
 
@@ -100,6 +101,7 @@ class EventListeners(val app: App) : KtxScreen {
     }
 
     override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
         initializeDimensions(width, height)
     }
 

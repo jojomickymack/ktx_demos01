@@ -1,16 +1,16 @@
 package org.central.screens.physics
 
+import kotlin.math.min
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
+import ktx.app.KtxInputAdapter
 import ktx.app.KtxScreen
+import ktx.box2d.body
 import ktx.box2d.createWorld
 import org.central.App
-import ktx.app.KtxInputAdapter
-import ktx.box2d.body
-import kotlin.math.min
 
 
 class SimpleGravity(val app: App) : KtxScreen {

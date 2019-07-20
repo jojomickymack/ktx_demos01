@@ -95,6 +95,9 @@ class DepthTest(val app: App) : KtxScreen {
         Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST)
         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST)
 
+        app.hudStg.act()
+        app.hudStg.draw()
+
         app.drawFps()
     }
 

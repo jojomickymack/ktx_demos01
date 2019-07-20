@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.GdxRuntimeException
 import org.central.App
 import org.central.assets.Images.small_window_wall
-import kotlin.system.exitProcess
 
 
 class Lightshafts(val app: App) : KtxScreen {
