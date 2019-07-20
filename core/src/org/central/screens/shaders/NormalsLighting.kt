@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.math.Vector3
 import ktx.app.KtxScreen
+import ktx.graphics.use
 import org.central.App
 import org.central.assets.Images.rock
 import org.central.assets.Images.rock_n
@@ -44,20 +45,17 @@ class NormalsLighting(val app: App) : KtxScreen {
         if (!normalsShader.isCompiled) throw GdxRuntimeException("Could not compile shader: ${normalsShader.log}")
 
         // setup default uniforms
-        normalsShader.begin()
+        normalsShader.use {
+            // our normal map
+            it.setUniformi("u_normals", 1) //GL_TEXTURE1
 
-        // our normal map
-        normalsShader.setUniformi("u_normals", 1) //GL_TEXTURE1
-
-        // light/ambient colors
-        // LibGDX doesn't have Vector4 class at the moment, so we pass them individually...
-        normalsShader.setUniformf("Resolution", app.width, app.height)
-        normalsShader.setUniformf("LightColor", LIGHT_COLOR.x, LIGHT_COLOR.y, LIGHT_COLOR.z, LIGHT_INTENSITY)
-        normalsShader.setUniformf("AmbientColor", AMBIENT_COLOR.x, AMBIENT_COLOR.y, AMBIENT_COLOR.z, AMBIENT_INTENSITY)
-        normalsShader.setUniformf("Falloff", FALLOFF)
-
-        // LibGDX likes us to end the shader program
-        normalsShader.end()
+            // light/ambient colors
+            // LibGDX doesn't have Vector4 class at the moment, so we pass them individually...
+            it.setUniformf("Resolution", app.width, app.height)
+            it.setUniformf("LightColor", LIGHT_COLOR.x, LIGHT_COLOR.y, LIGHT_COLOR.z, LIGHT_INTENSITY)
+            it.setUniformf("AmbientColor", AMBIENT_COLOR.x, AMBIENT_COLOR.y, AMBIENT_COLOR.z, AMBIENT_INTENSITY)
+            it.setUniformf("Falloff", FALLOFF)
+        }
 
         app.stg.batch.shader = normalsShader
     }
@@ -81,31 +79,29 @@ class NormalsLighting(val app: App) : KtxScreen {
             println("New light Z: " + LIGHT_POS.z)
         }
 
-        app.stg.batch.begin()
-
         //shader will now be in use...
+        app.stg.batch.use {
 
-        //update light position, normalized to screen resolution
-        val x = Gdx.input.x / app.width
-        val y = 1 - Gdx.input.y / app.height
+            //update light position, normalized to screen resolution
+            val x = Gdx.input.x / app.width
+            val y = 1 - Gdx.input.y / app.height
 
-        LIGHT_POS.x = x
-        LIGHT_POS.y = y
+            LIGHT_POS.x = x
+            LIGHT_POS.y = y
 
-        // send a Vector4f to GLSL
-        normalsShader.setUniformf("LightPos", LIGHT_POS)
+            // send a Vector4f to GLSL
+            normalsShader.setUniformf("LightPos", LIGHT_POS)
 
-        // bind normal map to texture unit 1
-        rockNormals.bind(1)
+            // bind normal map to texture unit 1
+            rockNormals.bind(1)
 
-        // bind diffuse color to texture unit 0
-        // important that we specify 0 otherwise we'll still be bound to glActiveTexture(GL_TEXTURE1)
-        rock.bind(0)
+            // bind diffuse color to texture unit 0
+            // important that we specify 0 otherwise we'll still be bound to glActiveTexture(GL_TEXTURE1)
+            rock.bind(0)
 
-        // draw the texture unit 0 with our shader effect applied
-        app.stg.batch.draw(rock, 0f, 0f, app.width, app.height)
-
-        app.stg.batch.end()
+            // draw the texture unit 0 with our shader effect applied
+            it.draw(rock, 0f, 0f, app.width, app.height)
+        }
 
         app.drawFps()
     }

@@ -116,13 +116,13 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         addScreen(TriangleDemo(this))
 
         // shaders
+        addScreen(Blur(this))
         addScreen(Negative(this))
         addScreen(Grayscale(this))
         addScreen(Sepia(this))
         addScreen(Vignette(this))
         addScreen(SimplexNoise(this))
         addScreen(Twist(this))
-        addScreen(Blur(this))
         addScreen(NormalsLighting(this))
         addScreen(Lightshafts(this))
         addScreen(Water(this))
@@ -154,13 +154,13 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "triangle" -> setScreen<TriangleDemo>()
 
             // shaders
+            "blur" -> setScreen<Blur>()
             "negative" -> setScreen<Negative>()
             "grayscale" -> setScreen<Grayscale>()
             "sepia" -> setScreen<Sepia>()
             "vignette" -> setScreen<Vignette>()
             "simplex" -> setScreen<SimplexNoise>()
             "twist" -> setScreen<Twist>()
-            "blur" -> setScreen<Blur>()
             "normals" -> setScreen<NormalsLighting>()
             "lightshafts" -> setScreen<Lightshafts>()
             "water" -> setScreen<Water>()
@@ -190,6 +190,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
     }
 
     override fun resize(width: Int, height: Int) {
+        println("resize!")
         this.width = width.toFloat()
         this.height = height.toFloat()
 

@@ -60,8 +60,7 @@ class Menu(val app: App) : KtxScreen {
             textButton("model shader") { onClick { app.setScreen<ModelCustomShader>() } }.cell(row = true)
             textButton("model animated") { onClick { app.setScreen<ModelAnimated>() } }.cell(row = true)
 /*
-            // box2d
-            textButton("blur") { onClick { app.setScreen<Blur>() } }.cell(row = true)
+            // box2
             textButton("gravity") { onClick { app.setScreen<SimpleGravity>() } }.cell(row = true)
             textButton("mouse joint") { onClick { app.setScreen<MouseJoint>() } }.cell(row = true)
             textButton("chain") { onClick { app.setScreen<ChainDemo>() } }.cell(row = true)
@@ -70,6 +69,7 @@ class Menu(val app: App) : KtxScreen {
             textButton("attractor") { onClick { app.setScreen<Attractor>() } }.cell(row = true)
 */
             // shaders
+            textButton("blur") { onClick { app.setScreen<Blur>() } }.cell(row = true)
             textButton("negative") { onClick { app.setScreen<Negative>() } }.cell(row = true)
             textButton("grayscale") { onClick { app.setScreen<Grayscale>() } }.cell(row = true)
             textButton("sepia") { onClick { app.setScreen<Sepia>() } }.cell(row = true)

@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.GL20
 import ktx.app.KtxScreen
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.GdxRuntimeException
+import ktx.graphics.use
 import org.central.App
 import org.central.assets.Images.badlogic
 
@@ -41,10 +42,10 @@ class Twist(val app: App) : KtxScreen {
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
-        app.stg.batch.begin()
-        simplexNoiseShader.setUniformf("time", time)
-        app.stg.batch.draw(tex, 0f, 0f, app.width, app.height)
-        app.stg.batch.end()
+        app.stg.batch.use {
+            simplexNoiseShader.setUniformf("time", time)
+            it.draw(tex, 0f, 0f, app.width, app.height)
+        }
 
         app.drawFps()
     }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.GdxRuntimeException
+import ktx.graphics.use
 import org.central.App
 import org.central.assets.Images.small_window_wall
 
@@ -32,8 +33,6 @@ class Lightshafts(val app: App) : KtxScreen {
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         initializeDimensions(width, height)
-        app.cam.setToOrtho(false, width.toFloat(), height.toFloat())
-        app.stg.batch.projectionMatrix = app.cam.combined
     }
 
     override fun show() {
@@ -48,9 +47,9 @@ class Lightshafts(val app: App) : KtxScreen {
         Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
-        app.sb.begin()
-        app.sb.draw(window, Gdx.input.x.toFloat() - window.width / 2, app.height - Gdx.input.y.toFloat() - window.height / 2)
-        app.sb.end()
+        app.sb.use {
+            it.draw(window, Gdx.input.x.toFloat() - window.width / 2, app.height - Gdx.input.y.toFloat() - window.height / 2)
+        }
 
         occludersFbo.end()
 
@@ -62,21 +61,20 @@ class Lightshafts(val app: App) : KtxScreen {
 
         app.sb.shader = occlusionApproxShader
 
-        app.sb.begin()
-        occlusionApproxShader.setUniformf("cent", 0.5f, 0.5f)
-        app.sb.draw(occludersFbo.colorBufferTexture, 0f, 0f, app.width, app.height, 0f, 0f, 1f, 1f)
-        app.sb.end()
+        app.sb.use {
+            occlusionApproxShader.setUniformf("cent", 0.5f, 0.5f)
+            it.draw(occludersFbo.colorBufferTexture, 0f, 0f, app.width, app.height, 0f, 0f, 1f, 1f)
+        }
 
         occlusionApprox.end()
 
         // cleanup and reset operations
-        app.view.apply()
         app.sb.shader = null
 
         // Apply post processing
-        app.sb.begin()
-        app.sb.draw(occlusionApprox.colorBufferTexture, 0f, 0f, app.width, app.height, 0f, 0f, 1f, 1f)
-        app.sb.end()
+        app.sb.use {
+            it.draw(occlusionApprox.colorBufferTexture, 0f, 0f, app.width, app.height, 0f, 0f, 1f, 1f)
+        }
 
         app.drawFps()
     }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.GL20
 import ktx.app.KtxScreen
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.GdxRuntimeException
+import ktx.graphics.use
 import org.central.App
 import org.central.assets.Images.badlogic
 import org.central.assets.Images.slime
@@ -28,10 +29,10 @@ class SimplexNoise(val app: App) : KtxScreen {
         simplexNoiseShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/simplex_noise.frag"))
         if (!simplexNoiseShader.isCompiled) throw GdxRuntimeException("Could not compile shader: ${simplexNoiseShader.log}")
 
-        simplexNoiseShader.begin()
-        simplexNoiseShader.setUniformi("u_texture1", 1)
-        simplexNoiseShader.setUniformi("u_mask", 2)
-        simplexNoiseShader.end()
+        simplexNoiseShader.use {
+            it.setUniformi("u_texture1", 1)
+            it.setUniformi("u_mask", 2)
+        }
 
         // bind mask to glActiveTexture(GL_TEXTURE2)
         mask.bind(2)
@@ -60,10 +61,10 @@ class SimplexNoise(val app: App) : KtxScreen {
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
-        app.stg.batch.begin()
-        simplexNoiseShader.setUniformf("time", time)
-        app.stg.batch.draw(slime, 0f, 0f, app.width, app.height)
-        app.stg.batch.end()
+        app.stg.batch.use {
+            simplexNoiseShader.setUniformf("time", time)
+            it.draw(slime, 0f, 0f, app.width, app.height)
+        }
 
         app.drawFps()
     }

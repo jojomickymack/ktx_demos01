@@ -9,6 +9,7 @@ import org.central.App
 import com.badlogic.gdx.graphics.VertexAttribute
 import com.badlogic.gdx.graphics.Mesh
 import com.badlogic.gdx.utils.GdxRuntimeException
+import ktx.graphics.use
 
 
 //Position attribute - (x, y)
@@ -72,13 +73,12 @@ class TriangleDemo(val app: App) : KtxScreen {
 
         app.cam.setToOrtho(false, app.width, app.height)
 
-        colorBlendShader.begin()
+        colorBlendShader.use {
+            //update the projection matrix so our triangles are rendered in 2D
+            it.setUniformMatrix("u_projTrans", app.cam.combined)
 
-        //update the projection matrix so our triangles are rendered in 2D
-        colorBlendShader.setUniformMatrix("u_projTrans", app.cam.combined)
-
-        triangleMesh.render(colorBlendShader, GL20.GL_TRIANGLES, 0, NUM_COMPONENTS)
-        colorBlendShader.end()
+            triangleMesh.render(it, GL20.GL_TRIANGLES, 0, NUM_COMPONENTS)
+        }
     }
 
     override fun dispose() {

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.Texture.TextureFilter
 import com.badlogic.gdx.utils.GdxRuntimeException
 import ktx.app.KtxScreen
+import ktx.graphics.use
 import org.central.App
 import org.central.assets.Images.badlogic
 import org.central.assets.Images.funny_face
@@ -38,11 +39,11 @@ class Blur(val app: App) : KtxScreen {
         if (!blurShader.isCompiled) throw GdxRuntimeException("Could not compile shader: ${blurShader.log}")
 
         //setup uniforms for our shader
-        blurShader.begin()
-        blurShader.setUniformf("dir", 0f, 0f)
-        blurShader.setUniformf("resolution", width.toFloat())
-        blurShader.setUniformf("radius", 1f)
-        blurShader.end()
+        blurShader.use {
+            it.setUniformf("dir", 0f, 0f)
+            it.setUniformf("resolution", width.toFloat())
+            it.setUniformf("radius", 1f)
+        }
 
         blurTargetA = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
         blurTargetB = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
@@ -65,81 +66,82 @@ class Blur(val app: App) : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        //Start rendering to an offscreen color buffer
-        blurTargetA.begin()
 
-        //Clear the offscreen buffer with an opaque background
-        Gdx.gl.glClearColor(0.7f, 0.3f, 0.7f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
+        // this is the equivalent of calling batch.begin() and batch.end() around the block - inside the block the batch is referred to as 'it'
+        app.stg.batch.use {
 
-        //before rendering, ensure we are using the default shader
-        app.stg.batch.shader = null
+            //Start rendering to an offscreen color buffer
+            blurTargetA.begin()
 
-        //resize the batch projection matrix before drawing with it
-        resizeBatch(app.width.toInt(), app.height.toInt())
+            //Clear the offscreen buffer with an opaque background
+            Gdx.gl.glClearColor(0.7f, 0.3f, 0.7f, 1f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
-        //now we can start drawing...
-        app.stg.batch.begin()
+            //before rendering, ensure we are using the default shader
+            it.shader = null
 
-        //draw our scene her
-        app.sb.draw(tex1, 0f, 0f)
-        app.sb.draw(tex2, tex1.width + 5f, 30f)
+            //resize the batch projection matrix before drawing with it
+            resizeBatch(app.width.toInt(), app.height.toInt())
 
-        //finish rendering to the offscreen buffer
-        app.stg.batch.flush()
+            //draw our scene her
+            it.draw(tex1, 0f, 0f)
+            it.draw(tex2, tex1.width + 5f, 30f)
 
-        //finish rendering to the offscreen buffer
-        blurTargetA.end()
+            //finish rendering to the offscreen buffer
+            it.flush()
 
-        //now let's start blurring the offscreen image
-        app.stg.batch.shader = blurShader
+            //finish rendering to the offscreen buffer
+            blurTargetA.end()
 
-        //since we never called batch.end(), we should still be drawing
-        //which means are blurShader should now be in use
+            //now let's start blurring the offscreen image
+            it.shader = blurShader
 
-        //ensure the direction is along the X-axis only
-        blurShader.setUniformf("dir", 1f, 0f)
+            //since we never called batch.end(), we should still be drawing
+            //which means are blurShader should now be in use
 
-        //update blur amount based on touch input
-        val mouseXAmt = Gdx.input.x / Gdx.graphics.width.toFloat()
-        blurShader.setUniformf("radius", mouseXAmt * MAX_BLUR)
+            //ensure the direction is along the X-axis only
+            blurShader.setUniformf("dir", 1f, 0f)
 
-        //our first blur pass goes to target B
-        blurTargetB.begin()
+            //update blur amount based on touch input
+            val mouseXAmt = Gdx.input.x / app.width
+            blurShader.setUniformf("radius", mouseXAmt * MAX_BLUR)
 
-        //we want to render FBO target A into target B
-        fboRegion.texture = blurTargetA.colorBufferTexture
+            //our first blur pass goes to target B
+            blurTargetB.begin()
 
-        //draw the scene to target B with a horizontal blur effect
-        app.stg.batch.draw(fboRegion, 0f, 0f)
+            //we want to render FBO target A into target B
+            fboRegion.texture = blurTargetA.colorBufferTexture
 
-        //flush the batch before ending the FBO
-        app.stg.batch.flush()
+            //draw the scene to target B with a horizontal blur effect
+            it.draw(fboRegion, 0f, 0f)
 
-        //finish rendering target B
-        blurTargetB.end()
+            //flush the batch before ending the FBO
+            it.flush()
 
-        //now we can render to the screen using the vertical blur shader
+            //finish rendering target B
+            blurTargetB.end()
 
-        //update our projection matrix with the screen size
-        resizeBatch(Gdx.graphics.width, Gdx.graphics.height)
+            //now we can render to the screen using the vertical blur shader
 
-        //update the blur only along Y-axis
-        blurShader.setUniformf("dir", 0f, 1f)
+            //update our projection matrix with the screen size
+            resizeBatch(app.width.toInt(), app.height.toInt())
 
-        //update the Y-axis blur radius
-        val mouseYAmt = Gdx.input.y / Gdx.graphics.height.toFloat()
-        blurShader.setUniformf("radius", mouseYAmt * MAX_BLUR)
+            //update the blur only along Y-axis
+            blurShader.setUniformf("dir", 0f, 1f)
 
-        //draw target B to the screen with a vertical blur effect
-        fboRegion.texture = blurTargetB.colorBufferTexture
-        app.stg.batch.draw(fboRegion, 0f, 0f)
+            //update the Y-axis blur radius
+            val mouseYAmt = Gdx.input.y / app.height
+            blurShader.setUniformf("radius", mouseYAmt * MAX_BLUR)
 
-        //reset to default shader without blurs
-        app.stg.batch.shader = null
+            //draw target B to the screen with a vertical blur effect
+            fboRegion.texture = blurTargetB.colorBufferTexture
+            it.draw(fboRegion, 0f, 0f)
 
-        //finally, end the batch since we have reached the end of the frame
-        app.stg.batch.end()
+            //reset to default shader without blurs
+            it.shader = null
+
+            //finally, end the batch since we have reached the end of the frame
+        }
 
         app.drawFps()
     }

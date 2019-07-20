@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.GdxRuntimeException
 import ktx.app.KtxScreen
+import ktx.graphics.use
 import org.central.App
 import org.central.assets.Images.badlogic
 
@@ -22,9 +23,9 @@ class Vignette(val app: App) : KtxScreen {
         if (!vignetteShader.isCompiled) throw GdxRuntimeException("Could not compile shader: ${vignetteShader.log}")
 
         // bind the shader, then set the uniform, then unbind the shader
-        vignetteShader.begin()
-        vignetteShader.setUniformf("resolution", width.toFloat(), height.toFloat())
-        vignetteShader.end()
+        vignetteShader.use {
+            it.setUniformf("resolution", width.toFloat(), height.toFloat())
+        }
 
         app.stg.batch.shader = vignetteShader
     }
@@ -41,10 +42,8 @@ class Vignette(val app: App) : KtxScreen {
     override fun render(delta: Float) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
-        with(app.stg.batch) {
-            begin()
-            draw(tex, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-            end()
+        app.stg.batch.use {
+            it.draw(tex, 0f, 0f, app.width, app.height)
         }
 
         app.drawFps()

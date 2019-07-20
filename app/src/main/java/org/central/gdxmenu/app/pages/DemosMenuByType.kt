@@ -21,7 +21,7 @@ class DemosMenuByType : Fragment() {
     private var ktxActorsList = mutableListOf("event-listeners", "actor-extensions", "actor-sequences")
     private var modelList = mutableListOf("model", "model-tinted", "model-custom-shader", "model-animated")
     private var openglList = mutableListOf("triangle", "depthtest")
-    private var box2dList = mutableListOf("gravity", "draggable", "chain", "launcher", "orbit", "attractor")
+    private var box2dList = mutableListOf("gravity", "mousejoints", "chain", "launcher", "orbit", "attractor")
     private var shadersList = mutableListOf("negative", "grayscale", "sepia", "vignette", "simplex", "twist", "blur", "normals", "lightshafts", "water")
 
     lateinit var adapter: MainDemosByTypeAdaptor

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import ktx.actors.onClick
 import ktx.actors.plusAssign
 import ktx.app.KtxScreen
+import ktx.graphics.use
 import ktx.scene2d.table
 import ktx.scene2d.textButton
 import org.central.App
@@ -61,22 +62,16 @@ class DepthTest(val app: App) : KtxScreen {
         ///////////// Draw mask shape(s)
 
         //6. render your primitive shapes
-        with(sr) {
-            begin(ShapeRenderer.ShapeType.Filled)
-
-            translate(app.width / 2, app.height / 2, 0f)
-            rotate(0f, 0f, 1f, rotation)
-            rect(0f, 0f, app.width / 8, app.width / 8)
-            circle(app.width / 4, app.width / 4, 50f)
-            identity()
-
-            end()
+        sr.use(ShapeRenderer.ShapeType.Filled) {
+            it.translate(app.width / 2, app.height / 2, 0f)
+            it.rotate(0f, 0f, 1f, rotation)
+            it.rect(0f, 0f, app.width / 8, app.width / 8)
+            it.circle(app.width / 4, app.width / 4, 50f)
+            it.identity()
         }
 
         ///////////// Draw sprite(s) to be masked
-        with(app.stg.batch) {
-            begin()
-
+        app.stg.batch.use {
             // 8. Enable RGBA color writing
             //   (SpriteBatch.begin() will disable depth mask)
             Gdx.gl.glColorMask(true, true, true, true)
@@ -87,8 +82,7 @@ class DepthTest(val app: App) : KtxScreen {
             // 10. Now depth discards pixels outside our masked shapes if the
             if (depthTestEqual) Gdx.gl.glDepthFunc(GL20.GL_EQUAL) else Gdx.gl.glDepthFunc(GL20.GL_ALWAYS)
 
-            draw(tex, 0f, 0f, app.width, app.height)
-            end()
+            it.draw(tex, 0f, 0f, app.width, app.height)
         }
 
         // disable the funky stuff so things can be drawn normally
