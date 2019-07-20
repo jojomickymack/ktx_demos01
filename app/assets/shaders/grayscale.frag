@@ -1,3 +1,14 @@
+#ifdef GL_ES
+#define LOWP lowp
+#define MED mediump
+#define HIGH highp
+precision mediump float;
+#else
+#define MED
+#define LOWP
+#define HIGH
+#endif
+
 uniform sampler2D u_texture;
 uniform vec2 resolution;
 
