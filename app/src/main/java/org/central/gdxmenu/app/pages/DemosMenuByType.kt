@@ -22,7 +22,7 @@ class DemosMenuByType : Fragment() {
     private var modelList = mutableListOf("model", "model-tinted", "model-custom-shader", "model-animated")
     private var openglList = mutableListOf("triangle", "depthtest")
     private var box2dList = mutableListOf("gravity", "mousejoints", "chain", "launcher", "orbit", "attractor")
-    private var shadersList = mutableListOf("negative", "grayscale", "sepia", "vignette", "simplex", "twist", "blur", "normals", "lightshafts", "water")
+    private var shadersList = mutableListOf("negative", "grayscale", "sepia", "vignette", "simplex", "twist", "blur", "normals", "lightshafts", "water", "fisheye")
 
     lateinit var adapter: MainDemosByTypeAdaptor
     var chosenType = ""

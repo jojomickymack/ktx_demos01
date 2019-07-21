@@ -53,14 +53,14 @@ class Menu(val app: App) : KtxScreen {
             // opengl
             textButton("depth test") { onClick { app.setScreen<DepthTest>() } }.cell(row = true)
             textButton("triangle") { onClick { app.setScreen<TriangleDemo>() } }.cell(row = true)
-
+/*
             // models
             textButton("model") { onClick { app.setScreen<ModelView>() } }.cell(row = true)
             textButton("model tinted") { onClick { app.setScreen<ModelTinted>() } }.cell(row = true)
             textButton("model shader") { onClick { app.setScreen<ModelCustomShader>() } }.cell(row = true)
             textButton("model animated") { onClick { app.setScreen<ModelAnimated>() } }.cell(row = true)
-/*
-            // box2
+
+            // box2d
             textButton("gravity") { onClick { app.setScreen<SimpleGravity>() } }.cell(row = true)
             textButton("mouse joint") { onClick { app.setScreen<MouseJoint>() } }.cell(row = true)
             textButton("chain") { onClick { app.setScreen<ChainDemo>() } }.cell(row = true)
@@ -79,6 +79,7 @@ class Menu(val app: App) : KtxScreen {
             textButton("twist") { onClick { app.setScreen<Twist>() } }.cell(row = true)
             textButton("lightshafts") { onClick { app.setScreen<Lightshafts>() } }.cell(row = true)
             textButton("water") { onClick { app.setScreen<Water>() } }.cell(row = true)
+            textButton("fisheye") { onClick { app.setScreen<Fisheye>() } }.cell(row = true)
 
         }
 
