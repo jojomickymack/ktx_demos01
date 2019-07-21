@@ -127,6 +127,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         addScreen(Lightshafts(this))
         addScreen(Water(this))
         addScreen(Fisheye(this))
+        addScreen(ColorOffset(this))
 
         // physics
         addScreen(SimpleGravity(this))
@@ -166,6 +167,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "lightshafts" -> setScreen<Lightshafts>()
             "water" -> setScreen<Water>()
             "fisheye" -> setScreen<Fisheye>()
+            "color-offset" -> setScreen<ColorOffset>()
 
             // physics
             "gravity" -> setScreen<SimpleGravity>()

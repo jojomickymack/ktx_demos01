@@ -80,6 +80,7 @@ class Menu(val app: App) : KtxScreen {
             textButton("lightshafts") { onClick { app.setScreen<Lightshafts>() } }.cell(row = true)
             textButton("water") { onClick { app.setScreen<Water>() } }.cell(row = true)
             textButton("fisheye") { onClick { app.setScreen<Fisheye>() } }.cell(row = true)
+            textButton("color offset") { onClick { app.setScreen<ColorOffset>() } }.cell(row = true)
 
         }
 
