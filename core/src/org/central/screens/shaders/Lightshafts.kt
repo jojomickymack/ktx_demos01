@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.GdxRuntimeException
+import ktx.app.clearScreen
 import ktx.graphics.use
 import org.central.App
 import org.central.assets.Images.small_window_wall
@@ -44,8 +45,7 @@ class Lightshafts(val app: App) : KtxScreen {
         // draws the black shape that blocks out the light
         occludersFbo.begin()
 
-        Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
+        clearScreen(0.6f, 0.6f, 0.6f)
 
         app.sb.use {
             it.draw(window, Gdx.input.x.toFloat() - window.width / 2, app.height - Gdx.input.y.toFloat() - window.height / 2)

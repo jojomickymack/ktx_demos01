@@ -53,7 +53,7 @@ class Menu(val app: App) : KtxScreen {
             // opengl
             textButton("depth test") { onClick { app.setScreen<DepthTest>() } }.cell(row = true)
             textButton("triangle") { onClick { app.setScreen<TriangleDemo>() } }.cell(row = true)
-/*
+
             // models
             textButton("model") { onClick { app.setScreen<ModelView>() } }.cell(row = true)
             textButton("model tinted") { onClick { app.setScreen<ModelTinted>() } }.cell(row = true)
@@ -67,7 +67,7 @@ class Menu(val app: App) : KtxScreen {
             textButton("launcher") { onClick { app.setScreen<LauncherDemo>() } }.cell(row = true)
             textButton("orbit") { onClick { app.setScreen<OrbitDemo>() } }.cell(row = true)
             textButton("attractor") { onClick { app.setScreen<Attractor>() } }.cell(row = true)
-*/
+
             // shaders
             textButton("blur") { onClick { app.setScreen<Blur>() } }.cell(row = true)
             textButton("negative") { onClick { app.setScreen<Negative>() } }.cell(row = true)

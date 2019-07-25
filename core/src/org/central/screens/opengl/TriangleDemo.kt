@@ -9,6 +9,7 @@ import org.central.App
 import com.badlogic.gdx.graphics.VertexAttribute
 import com.badlogic.gdx.graphics.Mesh
 import com.badlogic.gdx.utils.GdxRuntimeException
+import ktx.app.clearScreen
 import ktx.graphics.use
 
 
@@ -69,7 +70,7 @@ class TriangleDemo(val app: App) : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        clearScreen(0.6f, 0.6f, 0.6f)
 
         app.cam.setToOrtho(false, app.width, app.height)
 

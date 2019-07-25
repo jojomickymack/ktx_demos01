@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.Texture.TextureFilter
 import com.badlogic.gdx.utils.GdxRuntimeException
 import ktx.app.KtxScreen
+import ktx.app.clearScreen
 import ktx.graphics.use
 import org.central.App
 import org.central.assets.Images.badlogic
@@ -74,8 +75,7 @@ class Blur(val app: App) : KtxScreen {
             blurTargetA.begin()
 
             //Clear the offscreen buffer with an opaque background
-            Gdx.gl.glClearColor(0.7f, 0.3f, 0.7f, 1f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
+            clearScreen(0.7f, 0.3f, 0.7f)
 
             //before rendering, ensure we are using the default shader
             it.shader = null

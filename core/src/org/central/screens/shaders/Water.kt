@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.GdxRuntimeException
+import ktx.app.clearScreen
 import ktx.graphics.use
 import org.central.App
 import org.central.assets.Images.mountains
@@ -78,8 +79,7 @@ class Water(val app: App) : KtxScreen {
 
         // draws the reflection of the water into another framebuffer
         refractionFbo.begin()
-        Gdx.gl.glClearColor(1f, 1f, 1f, 0f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
+        clearScreen(0.6f, 0.6f, 0.6f)
 
         app.sb.use {
             it.draw(sceneFbo.colorBufferTexture, 0f, 0f, app.width, app.height)

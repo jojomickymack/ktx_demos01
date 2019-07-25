@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import ktx.actors.onClick
 import ktx.actors.plusAssign
 import ktx.app.KtxScreen
+import ktx.app.clearScreen
 import ktx.graphics.use
 import ktx.scene2d.table
 import ktx.scene2d.textButton
@@ -43,10 +44,10 @@ class DepthTest(val app: App) : KtxScreen {
         myButton.label.color = if (depthTestEqual) Color.WHITE else Color.BLACK
 
         //1. clear screen
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
+        clearScreen(0.6f, 0.6f, 0.6f)
 
         //2. clear our depth buffer with 1.0
-        Gdx.gl.glClearDepthf(1f);
+        Gdx.gl.glClearDepthf(1f)
         Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT)
 
         //3. set the function to LESS

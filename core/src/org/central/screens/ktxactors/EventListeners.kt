@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Align
 import ktx.actors.*
 import ktx.app.KtxInputAdapter
 import ktx.app.KtxScreen
+import ktx.app.clearScreen
 import ktx.scene2d.*
 import org.central.App
 
@@ -111,8 +112,7 @@ class EventListeners(val app: App) : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        Gdx.gl.glClearColor(0.6f, 0.6f, 0.6f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
+        clearScreen(0.6f, 0.6f, 0.6f)
         app.stg.act()
         app.stg.draw()
     }

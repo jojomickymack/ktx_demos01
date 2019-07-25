@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.math.Vector3
 import ktx.app.KtxScreen
+import ktx.app.clearScreen
 import ktx.graphics.use
 import org.central.App
 import org.central.assets.Images.rock
@@ -69,7 +70,7 @@ class NormalsLighting(val app: App) : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
+        clearScreen(0.6f, 0.6f, 0.6f)
 
         //reset light Z
         if (Gdx.input.justTouched()) {
