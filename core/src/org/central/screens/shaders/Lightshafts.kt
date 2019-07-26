@@ -1,7 +1,6 @@
 package org.central.screens.shaders
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.GL20
 import ktx.app.KtxScreen
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
@@ -56,8 +55,7 @@ class Lightshafts(val app: App) : KtxScreen {
         // calculates all of the lightrays
         occlusionApprox.begin()
 
-        Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
+        clearScreen(1f, 1f, 1f)
 
         app.sb.shader = occlusionApproxShader
 
