@@ -5,6 +5,7 @@ buildscript {
         gdxVersion = '1.9.9'
         ktxVersion = '1.9.9-b1'
         box2dlightsVersion = '1.4'
+        ashleyVersion = '1.7.3'
     }
 
     repositories {
@@ -86,6 +87,7 @@ project(':app') {
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
         implementation "com.badlogicgames.box2dlights:box2dlights:$box2dlightsVersion"
+        implementation "com.badlogicgames.ashley:ashley:$ashleyVersion"
     }
 }
 

@@ -11,6 +11,7 @@ import ktx.actors.onClick
 import ktx.scene2d.table
 import ktx.scene2d.textButton
 import org.central.screens.ktxactors.*
+import org.central.screens.ktxashley.BasicAshley
 import org.central.screens.models.*
 import org.central.screens.opengl.*
 import org.central.screens.physics.*
@@ -49,6 +50,9 @@ class Menu(val app: App) : KtxScreen {
             textButton("event-listeners") { onClick { app.setScreen<EventListeners>() } }.cell(row = true)
             textButton("actor-extensions") { onClick { app.setScreen<ActorExtensions>() } }.cell(row = true)
             textButton("actor-sequences") { onClick { app.setScreen<Sequences>() } }.cell(row = true)
+
+            // ktxashley
+            textButton("basic ashley") { onClick { app.setScreen<BasicAshley>() } }.cell(row = true)
 
             // opengl
             textButton("depth test") { onClick { app.setScreen<DepthTest>() } }.cell(row = true)

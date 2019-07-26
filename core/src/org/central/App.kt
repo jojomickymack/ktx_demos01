@@ -17,6 +17,7 @@ import ktx.app.KtxGame
 import ktx.scene2d.Scene2DSkin
 import org.central.screens.Menu
 import org.central.screens.ktxactors.*
+import org.central.screens.ktxashley.BasicAshley
 import org.central.screens.models.*
 import org.central.screens.opengl.*
 import org.central.screens.physics.*
@@ -105,6 +106,9 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         addScreen(ActorExtensions(this))
         addScreen(Sequences(this))
 
+        // ktxashley
+        addScreen(BasicAshley(this))
+
         // models
         addScreen(ModelView(this))
         addScreen(ModelTinted(this))
@@ -144,6 +148,10 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "event-listeners" -> setScreen<EventListeners>()
             "actor-extensions" -> setScreen<ActorExtensions>()
             "actor-sequences" -> setScreen<Sequences>()
+
+            // ktxashley
+
+            "basic-ashley" -> setScreen<BasicAshley>()
 
             // models
             "model" -> setScreen<ModelView>()

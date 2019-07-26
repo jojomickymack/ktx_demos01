@@ -19,6 +19,7 @@ class DemosMenuByType : Fragment() {
     private lateinit var demosMenuByTypeFragment: DemosMenuByType
     private lateinit var itemList: RecyclerView
     private var ktxActorsList = mutableListOf("event-listeners", "actor-extensions", "actor-sequences")
+    private var ktxAshleyList = mutableListOf("basic-ashley")
     private var modelList = mutableListOf("model", "model-tinted", "model-custom-shader", "model-animated")
     private var openglList = mutableListOf("triangle", "depthtest")
     private var box2dList = mutableListOf("gravity", "mousejoints", "chain", "launcher", "orbit", "attractor")
@@ -45,6 +46,7 @@ class DemosMenuByType : Fragment() {
         itemList = view.findViewById(R.id.demos_menu_item_list) as RecyclerView
         val demosList = when (chosenType) {
             "ktx-actors" -> ktxActorsList
+            "ktx-ashley" -> ktxAshleyList
             "models" -> modelList
             "opengl" -> openglList
             "box2d" -> box2dList
