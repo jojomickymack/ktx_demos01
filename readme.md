@@ -18,6 +18,9 @@ example is partly copied from [Rahul Srivastava's article](https://rotatingcanva
 Models - The animated model example uses a model from 
 [games from scratch](https://www.gamefromscratch.com/post/2014/01/19/3D-models-and-animation-from-Blender-to-LibGDX.aspx).
 
+Bullet - Heavily refactored version of 
+[ShootTest](https://github.com/libgdx/libgdx/blob/master/tests/gdx-tests/src/com/badlogic/gdx/tests/bullet/ShootTest.java).
+
 My goal is to gather lots of examples in one place - please add your own and submit a pull request!
 
 The desktop launcher uses the old 'scene2d' style menu, and is meant to be for ad-hock debugging and testing (and should probably be avoided). 
