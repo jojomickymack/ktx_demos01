@@ -114,7 +114,8 @@ class ShooterTest(val app: App) : KtxScreen {
     var maxSubSteps = 5
     var fixedTimeStep = 1f / 60f
 
-    private fun initializeCollision() {
+    fun initializeCollision() {
+        Bullet.init(true)
         collisionConfiguration = btDefaultCollisionConfiguration()
         dispatcher = btCollisionDispatcher(collisionConfiguration)
         broadphase = btDbvtBroadphase()
@@ -126,9 +127,6 @@ class ShooterTest(val app: App) : KtxScreen {
         val tmpV = Vector3()
 
         var modelInstance = ModelInstance(model, Matrix4().setToTranslation(x, y, z))
-
-        var bodyInfo: btRigidBody.btRigidBodyConstructionInfo
-        var body: btCollisionObject
 
         val boundingBox = BoundingBox()
         model.calculateBoundingBox(boundingBox)
@@ -142,8 +140,8 @@ class ShooterTest(val app: App) : KtxScreen {
 
         val motionState = MotionState(modelInstance.transform)
 
-        bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, motionState, collisionShape, localInertia)
-        body = btRigidBody(bodyInfo)
+        val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, motionState, collisionShape, localInertia)
+        val body = btRigidBody(bodyInfo)
 
         val bulletEntity = BulletEntity(modelInstance, body)
 
@@ -151,7 +149,7 @@ class ShooterTest(val app: App) : KtxScreen {
         entities.add(bulletEntity)
         models.add(model)
 
-        collisionWorld.addRigidBody(body)
+        collisionWorld?.addRigidBody(body)
 
         return bulletEntity
     }
@@ -160,8 +158,22 @@ class ShooterTest(val app: App) : KtxScreen {
         entity.setColor(0.25f + 0.5f * Math.random().toFloat(), 0.25f + 0.5f * Math.random().toFloat(), 0.25f + 0.5f * Math.random().toFloat(), 1f)
     }
 
+    private fun initializeDimensions(width: Int, height: Int) {
+        camera = if (app.width > app.height) PerspectiveCamera(67f, 3f * width / height, 3f)
+        else PerspectiveCamera(67f, 3f, 3f * height / width)
+
+        camera.position.set(10f, 10f, 10f)
+        camera.lookAt(0f, 0f, 0f)
+        camera.update()
+    }
+
+    override fun resize(width: Int, height: Int) {
+        initializeDimensions(width, height)
+    }
+
     override fun show() {
-        Bullet.init()
+        initializeDimensions(app.width.toInt(), app.height.toInt())
+
         initializeCollision()
 
         environment.set(ColorAttribute(ColorAttribute.AmbientLight, 0.3f, 0.3f, 0.3f, 1f))
@@ -171,16 +183,7 @@ class ShooterTest(val app: App) : KtxScreen {
 
         environment.shadowMap = light as DirectionalShadowLight
 
-        collisionWorld.gravity = Vector3(0f, -10f, 0f)
-
-        val width = Gdx.graphics.width.toFloat()
-        val height = Gdx.graphics.height.toFloat()
-        camera = if (width > height) PerspectiveCamera(67f, 3f * width / height, 3f)
-        else PerspectiveCamera(67f, 3f, 3f * height / width)
-
-        camera.position.set(10f, 10f, 10f)
-        camera.lookAt(0f, 0f, 0f)
-        camera.update()
+        collisionWorld?.gravity = Vector3(0f, -10f, 0f)
 
         // Create some simple models
         val wallHorizontal = modelBuilder.createBox(40f, 20f, 1f,
@@ -230,7 +233,7 @@ class ShooterTest(val app: App) : KtxScreen {
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
-        collisionWorld.stepSimulation(delta, maxSubSteps, fixedTimeStep)
+        collisionWorld?.stepSimulation(delta, maxSubSteps, fixedTimeStep)
         camera.update()
 
         (light as DirectionalShadowLight).begin(Vector3.Zero, camera.direction)
