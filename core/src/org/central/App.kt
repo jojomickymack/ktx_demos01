@@ -22,6 +22,7 @@ import org.central.screens.models.*
 import org.central.screens.opengl.*
 import org.central.screens.physics.*
 import org.central.screens.shaders.*
+import org.central.screens.bullet.*
 
 
 class App(val gameChoice: String) : KtxGame<Screen>() {
@@ -109,6 +110,9 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         // ktxashley
         addScreen(BasicAshley(this))
 
+        // bullet
+        addScreen(ShooterTest(this))
+
         // models
         addScreen(ModelView(this))
         addScreen(ModelTinted(this))
@@ -150,8 +154,10 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "actor-sequences" -> setScreen<Sequences>()
 
             // ktxashley
-
             "basic-ashley" -> setScreen<BasicAshley>()
+
+            // bullet
+            "shooter-test" -> setScreen<ShooterTest>()
 
             // models
             "model" -> setScreen<ModelView>()

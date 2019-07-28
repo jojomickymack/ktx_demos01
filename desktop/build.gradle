@@ -33,4 +33,5 @@ dependencies {
     implementation "com.badlogicgames.gdx:gdx-controllers-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-bullet-platform:$bulletVersion:natives-desktop"
 }

@@ -10,8 +10,9 @@ import org.central.assets.Images.*
 import ktx.actors.onClick
 import ktx.scene2d.table
 import ktx.scene2d.textButton
+import org.central.screens.bullet.*
 import org.central.screens.ktxactors.*
-import org.central.screens.ktxashley.BasicAshley
+import org.central.screens.ktxashley.*
 import org.central.screens.models.*
 import org.central.screens.opengl.*
 import org.central.screens.physics.*
@@ -53,6 +54,9 @@ class Menu(val app: App) : KtxScreen {
 
             // ktxashley
             textButton("basic ashley") { onClick { app.setScreen<BasicAshley>() } }.cell(row = true)
+
+            // bullet
+            textButton("shooter test") { onClick { app.setScreen<ShooterTest>() } }.cell(row = true)
 
             // opengl
             textButton("depth test") { onClick { app.setScreen<DepthTest>() } }.cell(row = true)
