@@ -21,11 +21,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch
 
 class ModelTinted(val app: App) : KtxScreen {
 
-    private lateinit var modelStgModelBatch: ModelBatch
-
-    private lateinit var modelStg: Stage
-    private lateinit var modelStgView: StretchViewport
-    private lateinit var modelStgCam: PerspectiveCamera
+    private lateinit var customModelBatch: ModelBatch
 
     private lateinit var camController: CameraInputController
     private lateinit var directionalLight: DirectionalLight
@@ -45,20 +41,15 @@ class ModelTinted(val app: App) : KtxScreen {
     var loading = false
 
     private fun initializeDimensions(width: Int, height: Int) {
-        modelStgCam = PerspectiveCamera(10f, width.toFloat(), height.toFloat())
-
-        modelStgView = if (app.portrait) StretchViewport(app.smallerDimension, app.largerDimension, modelStgCam) else StretchViewport(app.largerDimension, app.smallerDimension, modelStgCam)
-        modelStg = Stage(modelStgView)
-
         environment = Environment()
         directionalLight = DirectionalLight().set(1f, 1f, 1f, lightX, -20f, -50f)
         environment.add(directionalLight)
 
-        modelStgCam.position.set(0f, 0f, 20f)
-        modelStgCam.lookAt(0f, 0f, 0f)
-        modelStgCam.near = 0.7f
-        modelStgCam.far = 100f
-        modelStgCam.update()
+        app.modelStgCam.position.set(0f, 0f, 20f)
+        app.modelStgCam.lookAt(0f, 0f, 0f)
+        app.modelStgCam.near = 0.7f
+        app.modelStgCam.far = 100f
+        app.modelStgCam.update()
     }
 
     override fun resize(width: Int, height: Int) {
@@ -77,9 +68,9 @@ class ModelTinted(val app: App) : KtxScreen {
 
         config.fragmentShader = Gdx.files.internal("shaders/tweaked_default.frag").readString()
 
-        modelStgModelBatch = ModelBatch(DefaultShaderProvider(config))
+        customModelBatch = ModelBatch(DefaultShaderProvider(config))
 
-        camController = CameraInputController(modelStgCam)
+        camController = CameraInputController(app.modelStgCam)
         Gdx.input.inputProcessor = camController
 
         assets = AssetManager()
@@ -111,9 +102,9 @@ class ModelTinted(val app: App) : KtxScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
         if (!loading) {
-            modelStgModelBatch.begin(modelStgCam)
-            modelStgModelBatch.render(instances, environment)
-            modelStgModelBatch.end()
+            customModelBatch.begin(app.modelStgCam)
+            customModelBatch.render(instances, environment)
+            customModelBatch.end()
         }
 
         lightX += lightXInc
@@ -122,7 +113,7 @@ class ModelTinted(val app: App) : KtxScreen {
     }
 
     override fun dispose() {
-        modelStgModelBatch.dispose()
+        customModelBatch.dispose()
         assets.dispose()
     }
 }

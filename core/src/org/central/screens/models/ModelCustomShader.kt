@@ -104,12 +104,6 @@ void main() {
 
 class ModelCustomShader(val app: App) : KtxScreen {
 
-    private lateinit var modelStgModelBatch: ModelBatch
-
-    private lateinit var modelStg: Stage
-    private lateinit var modelStgView: StretchViewport
-    private lateinit var modelStgCam: PerspectiveCamera
-
     private lateinit var camController: CameraInputController
     private lateinit var directionalLight: DirectionalLight
 
@@ -132,16 +126,11 @@ class ModelCustomShader(val app: App) : KtxScreen {
     var loading = false
 
     private fun initializeDimensions(width: Int, height: Int) {
-        modelStgCam = PerspectiveCamera(10f, width.toFloat(), height.toFloat())
-
-        modelStgView = if (app.portrait) StretchViewport(app.smallerDimension, app.largerDimension, modelStgCam) else StretchViewport(app.largerDimension, app.smallerDimension, modelStgCam)
-        modelStg = Stage(modelStgView)
-
-        modelStgCam.position.set(0f, 0f, 20f)
-        modelStgCam.lookAt(0f, 0f, 0f)
-        modelStgCam.near = 0.7f
-        modelStgCam.far = 100f
-        modelStgCam.update()
+        app.modelStgCam.position.set(0f, 0f, 20f)
+        app.modelStgCam.lookAt(0f, 0f, 0f)
+        app.modelStgCam.near = 0.7f
+        app.modelStgCam.far = 100f
+        app.modelStgCam.update()
 
         environment = Environment()
         directionalLight = DirectionalLight().set(1f, 1f, 1f, lightX, -20f, -50f)
@@ -150,9 +139,8 @@ class ModelCustomShader(val app: App) : KtxScreen {
 
     override fun show() {
         initializeDimensions(app.width.toInt(), app.height.toInt())
-        modelStgModelBatch = ModelBatch()
 
-        camController = CameraInputController(modelStgCam)
+        camController = CameraInputController(app.modelStgCam)
         Gdx.input.inputProcessor = camController
 
         assets = AssetManager()
@@ -191,9 +179,9 @@ class ModelCustomShader(val app: App) : KtxScreen {
 
         if (!loading) {
             shader.runTime = runTimer
-            modelStgModelBatch.begin(modelStgCam)
-            modelStgModelBatch.render(instances, environment, shader)
-            modelStgModelBatch.end()
+            app.modelBatch.begin(app.modelStgCam)
+            app.modelBatch.render(instances, environment, shader)
+            app.modelBatch.end()
         }
 
         lightX += lightXInc
@@ -202,7 +190,6 @@ class ModelCustomShader(val app: App) : KtxScreen {
     }
 
     override fun dispose() {
-        modelStgModelBatch.dispose()
         shader.dispose()
         assets.dispose()
     }

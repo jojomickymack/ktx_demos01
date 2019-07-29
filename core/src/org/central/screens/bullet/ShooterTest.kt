@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g3d.attributes.*
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight
 import com.badlogic.gdx.graphics.g3d.utils.*
-import com.badlogic.gdx.physics.bullet.Bullet
 import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.*
 import com.badlogic.gdx.physics.bullet.linearmath.btMotionState
@@ -93,35 +92,16 @@ class ShooterTest(val app: App) : KtxScreen {
     internal val BOXOFFSET_Z = 0f
 
     var environment = Environment()
-    var light: DirectionalLight? = null
-    var shadowBatch = ModelBatch(DepthShaderProvider())
+    var light = DirectionalShadowLight(1024, 1024, 20f, 20f, 1f, 300f)
 
     val constructors = Array<btRigidBody.btRigidBodyConstructionInfo>()
     val entities = Array<BulletEntity>()
     val models = Array<Model>()
 
     var modelBuilder = ModelBuilder()
-    var modelBatch = ModelBatch()
-
-    lateinit var camera: PerspectiveCamera
-
-    lateinit var collisionConfiguration: btDefaultCollisionConfiguration
-    lateinit var dispatcher: btCollisionDispatcher
-    lateinit var broadphase: btDbvtBroadphase
-    lateinit var solver: btSequentialImpulseConstraintSolver
-    lateinit var collisionWorld: btDiscreteDynamicsWorld
 
     var maxSubSteps = 5
     var fixedTimeStep = 1f / 60f
-
-    fun initializeCollision() {
-        Bullet.init(true)
-        collisionConfiguration = btDefaultCollisionConfiguration()
-        dispatcher = btCollisionDispatcher(collisionConfiguration)
-        broadphase = btDbvtBroadphase()
-        solver = btSequentialImpulseConstraintSolver()
-        collisionWorld = btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration)
-    }
 
     private fun setUpEntity(model: Model, mass: Float, x: Float, y: Float, z: Float): BulletEntity {
         val tmpV = Vector3()
@@ -149,7 +129,7 @@ class ShooterTest(val app: App) : KtxScreen {
         entities.add(bulletEntity)
         models.add(model)
 
-        collisionWorld?.addRigidBody(body)
+        app.collisionWorld.addRigidBody(body)
 
         return bulletEntity
     }
@@ -159,12 +139,12 @@ class ShooterTest(val app: App) : KtxScreen {
     }
 
     private fun initializeDimensions(width: Int, height: Int) {
-        camera = if (app.width > app.height) PerspectiveCamera(67f, 3f * width / height, 3f)
+        app.modelStgCam = if (width > height) PerspectiveCamera(67f, 3f * width / height, 3f)
         else PerspectiveCamera(67f, 3f, 3f * height / width)
 
-        camera.position.set(10f, 10f, 10f)
-        camera.lookAt(0f, 0f, 0f)
-        camera.update()
+        app.modelStgCam.position.set(10f, 10f, 10f)
+        app.modelStgCam.lookAt(0f, 0f, 0f)
+        app.modelStgCam.update()
     }
 
     override fun resize(width: Int, height: Int) {
@@ -174,16 +154,13 @@ class ShooterTest(val app: App) : KtxScreen {
     override fun show() {
         initializeDimensions(app.width.toInt(), app.height.toInt())
 
-        initializeCollision()
-
         environment.set(ColorAttribute(ColorAttribute.AmbientLight, 0.3f, 0.3f, 0.3f, 1f))
-        light = DirectionalShadowLight(1024, 1024, 20f, 20f, 1f, 300f)
-        light!!.set(0.8f, 0.8f, 0.8f, -0.5f, -1f, 0.7f)
+        light.set(0.8f, 0.8f, 0.8f, -0.5f, -1f, 0.7f)
         environment.add(light)
 
-        environment.shadowMap = light as DirectionalShadowLight
+        environment.shadowMap = light
 
-        collisionWorld?.gravity = Vector3(0f, -10f, 0f)
+        app.collisionWorld.gravity = Vector3(0f, -10f, 0f)
 
         // Create some simple models
         val wallHorizontal = modelBuilder.createBox(40f, 20f, 1f,
@@ -215,7 +192,7 @@ class ShooterTest(val app: App) : KtxScreen {
 
         setUpEntity(playerModel, 1f, 5f, 3f, 5f)
 
-        //val cameraController = CameraInputController(camera)
+        // val cameraController = CameraInputController(camera)
         Gdx.input.inputProcessor = InputMultiplexer(inputProcessor)
 
         for (x in 0 until BOXCOUNT_X) {
@@ -233,27 +210,27 @@ class ShooterTest(val app: App) : KtxScreen {
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
-        collisionWorld?.stepSimulation(delta, maxSubSteps, fixedTimeStep)
-        camera.update()
+        app.collisionWorld.stepSimulation(delta, maxSubSteps, fixedTimeStep)
+        app.modelStgCam.update()
 
-        (light as DirectionalShadowLight).begin(Vector3.Zero, camera.direction)
-        shadowBatch.begin((light as DirectionalShadowLight).camera)
+        light.begin(Vector3.Zero, app.modelStgCam.direction)
+        app.shadowBatch.begin((light).camera)
         for (e in entities) {
-            shadowBatch.render(e.modelInstance, environment)
+            app.shadowBatch.render(e.modelInstance, environment)
         }
-        shadowBatch.end()
-        (light as DirectionalShadowLight).end()
+        app.shadowBatch.end()
+        light.end()
 
-        modelBatch.begin(camera)
+        app.modelBatch.begin(app.modelStgCam)
         for (e in entities) {
-            modelBatch.render(e.modelInstance, environment)
+            app.modelBatch.render(e.modelInstance, environment)
         }
-        modelBatch.end()
+        app.modelBatch.end()
     }
 
     fun shoot(x: Float, y: Float, impulse: Float = 30f): BulletEntity {
         // Shoot a box
-        val ray = camera.getPickRay(x, y)
+        val ray = app.modelStgCam.getPickRay(x, y)
         val boxModel = modelBuilder.createBox(1f, 1f, 1f, Material(ColorAttribute.createDiffuse(Color.WHITE),
                 ColorAttribute.createSpecular(Color.WHITE), FloatAttribute.createShininess(64f)), (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal).toLong())
         val box = setUpEntity(boxModel, 1f, ray.origin.x, ray.origin.y, ray.origin.z)
@@ -271,15 +248,6 @@ class ShooterTest(val app: App) : KtxScreen {
     }
 
     override fun dispose() {
-        collisionWorld.dispose()
-        solver.dispose()
-        broadphase.dispose()
-        dispatcher.dispose()
-        collisionConfiguration.dispose()
-
-        modelBatch.dispose()
-        shadowBatch.dispose()
-
         for (e in entities) e.dispose()
         entities.clear()
 

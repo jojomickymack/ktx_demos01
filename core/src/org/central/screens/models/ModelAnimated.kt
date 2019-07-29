@@ -23,12 +23,6 @@ import org.central.App
 
 class ModelAnimated(val app: App) : KtxScreen {
 
-    private lateinit var modelStgModelBatch: ModelBatch
-
-    private lateinit var modelStg: Stage
-    private lateinit var modelStgView: StretchViewport
-    private lateinit var modelStgCam: PerspectiveCamera
-
     private lateinit var camController: CameraInputController
 
     private lateinit var assets: AssetManager
@@ -41,20 +35,15 @@ class ModelAnimated(val app: App) : KtxScreen {
     private var loading = false
 
     private fun initializeDimensions(width: Int, height: Int) {
-        modelStgCam = PerspectiveCamera(10f, width.toFloat(), height.toFloat())
-
-        modelStgView = if (app.portrait) StretchViewport(app.smallerDimension, app.largerDimension, modelStgCam) else StretchViewport(app.largerDimension, app.smallerDimension, modelStgCam)
-        modelStg = Stage(modelStgView)
-
         environment = Environment()
         environment.set(ColorAttribute(AmbientLight, 0.4f, 0.4f, 0.4f, 1f))
         environment.add(DirectionalLight().set(0f, 0f, 1f, 500f, 500f, 6f))
 
-        modelStgCam.position.set(0f, 0f, 50f)
-        modelStgCam.lookAt(0f, 0f, 0f)
-        modelStgCam.near = 0.2f
-        modelStgCam.far = 300f
-        modelStgCam.update()
+        app.modelStgCam.position.set(0f, 0f, 50f)
+        app.modelStgCam.lookAt(0f, 0f, 0f)
+        app.modelStgCam.near = 0.2f
+        app.modelStgCam.far = 300f
+        app.modelStgCam.update()
     }
 
     override fun resize(width: Int, height: Int) {
@@ -65,8 +54,7 @@ class ModelAnimated(val app: App) : KtxScreen {
     override fun show() {
         initializeDimensions(app.width.toInt(), app.height.toInt())
 
-        modelStgModelBatch = ModelBatch()
-        camController = CameraInputController(modelStgCam)
+        camController = CameraInputController(app.modelStgCam)
         Gdx.input.inputProcessor = camController
 
         assets = AssetManager()
@@ -114,15 +102,14 @@ class ModelAnimated(val app: App) : KtxScreen {
 
         if (!loading) controllers.forEach { it.update(delta) }
 
-        modelStgModelBatch.begin(modelStgCam)
-        modelStgModelBatch.render(instances, environment)
-        modelStgModelBatch.end()
+        app.modelBatch.begin(app.modelStgCam)
+        app.modelBatch.render(instances, environment)
+        app.modelBatch.end()
 
         app.drawFps()
     }
 
     override fun dispose() {
-        modelStgModelBatch.dispose()
         instances.clear()
         assets.dispose()
     }

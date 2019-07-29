@@ -4,20 +4,32 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g3d.ModelBatch
+import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.central.input.GamepadCtl
-import com.central.input.InputCtl
-import org.central.assets.*
-import org.central.assets.Fonts.SDS_6x6
+import com.badlogic.gdx.physics.bullet.Bullet
+import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher
+import com.badlogic.gdx.physics.bullet.collision.btDbvtBroadphase
+import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration
+import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
+import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver
+
 import ktx.app.KtxGame
 import ktx.scene2d.Scene2DSkin
+
+import com.central.input.GamepadCtl
+import com.central.input.InputCtl
+import ktx.graphics.use
+import org.central.assets.*
+import org.central.assets.Fonts.SDS_6x6
 import org.central.screens.Menu
 import org.central.screens.ktxactors.*
-import org.central.screens.ktxashley.BasicAshley
+import org.central.screens.ktxashley.*
 import org.central.screens.models.*
 import org.central.screens.opengl.*
 import org.central.screens.physics.*
@@ -43,15 +55,30 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
     private val fontSize = 5f
 
     lateinit var sb: SpriteBatch
-    private lateinit var hudSb: SpriteBatch
+    lateinit var hudSb: SpriteBatch
+
+    lateinit var shadowBatch: ModelBatch
+    lateinit var modelBatch: ModelBatch
 
     lateinit var cam: OrthographicCamera
     lateinit var view: StretchViewport
     lateinit var stg: Stage
 
     lateinit var hudCam: OrthographicCamera
-    private lateinit var hudView: StretchViewport
+    lateinit var hudView: StretchViewport
     lateinit var hudStg: Stage
+
+    // it's probably possible to use the same stage as some of the other examples, but since the
+    // camera is different I don't want to risk messing things up
+    lateinit var modelStgCam: PerspectiveCamera
+    lateinit var modelStgView: StretchViewport
+    lateinit var modelStg: Stage
+
+    lateinit var collisionConfiguration: btDefaultCollisionConfiguration
+    lateinit var dispatcher: btCollisionDispatcher
+    lateinit var broadphase: btDbvtBroadphase
+    lateinit var solver: btSequentialImpulseConstraintSolver
+    lateinit var collisionWorld: btDiscreteDynamicsWorld
 
     lateinit var ic: InputCtl
     lateinit var gpc: GamepadCtl
@@ -72,6 +99,9 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         this.sb = SpriteBatch()
         this.hudSb = SpriteBatch()
 
+        this.shadowBatch = ModelBatch(DepthShaderProvider())
+        this.modelBatch = ModelBatch()
+
         this.portrait = width < height
 
         this.cam = OrthographicCamera(this.width, this.height)
@@ -81,6 +111,21 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         this.hudCam = OrthographicCamera(this.width, this.height)
         this.hudView = if (portrait) StretchViewport(smallerDimension, largerDimension, this.hudCam) else StretchViewport(largerDimension, smallerDimension, this.hudCam)
         this.hudStg = Stage(this.hudView, this.hudSb)
+
+        this.modelStgCam = PerspectiveCamera(10f, this.width, this.height)
+        this.modelStgView = if (portrait) StretchViewport(smallerDimension, largerDimension, modelStgCam) else StretchViewport(largerDimension, smallerDimension, modelStgCam)
+        this.modelStg = Stage(modelStgView)
+
+        // these bullet objects need to be global or they run into problems with the garbage collector
+        // if they are instantiated at the screen level, the app will crash when you switch between the libgdx game and the
+        // activity that launched it and then reopen the game
+
+        Bullet.init(true)
+        this.collisionConfiguration = btDefaultCollisionConfiguration()
+        this.dispatcher = btCollisionDispatcher(collisionConfiguration)
+        this.broadphase = btDbvtBroadphase()
+        this.solver = btSequentialImpulseConstraintSolver()
+        this.collisionWorld = btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration)
 
         ic = InputCtl(this)
         gpc = GamepadCtl(this)
@@ -196,6 +241,12 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
     }
 
     override fun dispose() {
+        this.collisionWorld.dispose()
+        this.solver.dispose()
+        this.broadphase.dispose()
+        this.dispatcher.dispose()
+        this.collisionConfiguration.dispose()
+
         this.textureManager.dispose()
         this.soundManager.dispose()
         this.tuneManager.dispose()
@@ -203,8 +254,13 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
 
         this.sb.dispose()
         this.hudSb.dispose()
+
+        this.shadowBatch.dispose()
+        this.modelBatch.dispose()
+
         this.stg.dispose()
         this.hudStg.dispose()
+        this.modelStg.dispose()
     }
 
     override fun resize(width: Int, height: Int) {
@@ -216,11 +272,12 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         this.portrait = width < height
         this.view = if (portrait) StretchViewport(smallerDimension, largerDimension, this.cam) else StretchViewport(largerDimension, smallerDimension, this.cam)
         this.hudView = if (portrait) StretchViewport(smallerDimension, largerDimension, this.hudCam) else StretchViewport(largerDimension, smallerDimension, this.hudCam)
+        this.modelStgView = if (portrait) StretchViewport(smallerDimension, largerDimension, modelStgCam) else StretchViewport(largerDimension, smallerDimension, modelStgCam)
     }
 
     fun drawFps() {
-        this.hudSb.begin()
-        this.font.draw(this.hudSb, Gdx.graphics.framesPerSecond.toString(), 0f, this.font.lineHeight)
-        this.hudSb.end()
+        this.hudSb.use {
+            this.font.draw(this.hudSb, Gdx.graphics.framesPerSecond.toString(), 0f, this.font.lineHeight)
+        }
     }
 }
