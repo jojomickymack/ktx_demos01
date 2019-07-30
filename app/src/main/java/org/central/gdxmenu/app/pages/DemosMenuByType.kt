@@ -22,7 +22,7 @@ class DemosMenuByType : Fragment() {
     private var ktxAshleyList = mutableListOf("basic-ashley")
     private var bulletList = mutableListOf("shooter-test")
     private var modelList = mutableListOf("model", "model-tinted", "model-custom-shader", "model-animated")
-    private var openglList = mutableListOf("triangle", "depthtest")
+    private var openglList = mutableListOf("triangle", "depthtest", "shadow-map")
     private var box2dList = mutableListOf("gravity", "mousejoints", "chain", "launcher", "orbit", "attractor")
     private var shadersList = mutableListOf("negative", "grayscale", "sepia", "vignette", "simplex", "twist", "blur", "normals", "lightshafts", "water", "fisheye", "color-offset")
 

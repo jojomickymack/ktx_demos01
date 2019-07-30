@@ -167,6 +167,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         // opengl
         addScreen(DepthTest(this))
         addScreen(TriangleDemo(this))
+        addScreen(ShadowMap(this))
 
         // shaders
         addScreen(Blur(this))
@@ -213,6 +214,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             // opengl
             "depthtest" -> setScreen<DepthTest>()
             "triangle" -> setScreen<TriangleDemo>()
+            "shadow-map" -> setScreen<ShadowMap>()
 
             // shaders
             "blur" -> setScreen<Blur>()

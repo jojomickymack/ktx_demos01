@@ -19,7 +19,8 @@ enum class Images {
     dummy,
     hero,
     enemy,
-    default;
+    default,
+    stars;
 
 
     val path = "images/${name}.png"
