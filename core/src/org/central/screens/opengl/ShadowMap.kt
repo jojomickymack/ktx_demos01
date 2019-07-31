@@ -15,6 +15,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import org.central.App
 import ktx.app.KtxScreen
+import ktx.app.clearScreen
+import ktx.graphics.use
 import org.central.assets.Images.stars
 
 
@@ -23,29 +25,29 @@ class ShadowMap(val app: App) : KtxScreen {
     private val lightSize = 500
     private val upScale = 1f // for example; try lightSize=128, upScale=1.5f
 
-    var casterSprites = stars()
-    var lights = GdxArray<Light>()
+    private var casterSprites = stars()
+    private var lights = GdxArray<Light>()
 
-    var additive = true
-    var softShadows = true
+    private var additive = true
+    private var softShadows = true
 
     // build frame buffers
-    var occludersFBO = FrameBuffer(Format.RGBA8888, lightSize, lightSize, false)
-    var shadowMapFBO = FrameBuffer(Format.RGBA8888, lightSize, 1, false)
+    private var occludersFBO = FrameBuffer(Format.RGBA8888, lightSize, lightSize, false)
+    private var shadowMapFBO = FrameBuffer(Format.RGBA8888, lightSize, 1, false)
 
-    var occluders = TextureRegion(occludersFBO.colorBufferTexture) //occluder map
+    private var occluders = TextureRegion(occludersFBO.colorBufferTexture) //occluder map
 
     // our 1D shadow map, lightSize x 1 pixels, no depth
-    val shadowMapTex = shadowMapFBO.colorBufferTexture
+    private val shadowMapTex = shadowMapFBO.colorBufferTexture
 
-    var shadowMap1D = TextureRegion(shadowMapTex) //1 dimensional shadow map
+    private var shadowMap1D = TextureRegion(shadowMapTex) //1 dimensional shadow map
 
-    lateinit var shadowMapShader: ShaderProgram
-    lateinit var shadowRenderShader: ShaderProgram
+    private lateinit var shadowMapShader: ShaderProgram
+    private lateinit var shadowRenderShader: ShaderProgram
 
     class Light(var x: Float, var y: Float, var color: Color)
 
-    internal fun randomColor(): Color {
+    private fun randomColor(): Color {
         val intensity = Math.random().toFloat() * 0.5f + 0.5f
         return Color(Math.random().toFloat(), Math.random().toFloat(), Math.random().toFloat(), intensity)
     }
@@ -76,17 +78,21 @@ class ShadowMap(val app: App) : KtxScreen {
             }
 
             override fun keyDown(key: Int): Boolean {
-                if (key == Keys.SPACE) {
-                    clearLights()
-                    return true
-                } else if (key == Keys.A) {
-                    additive = !additive
-                    return true
-                } else if (key == Keys.S) {
-                    softShadows = !softShadows
-                    return true
+                when (key) {
+                    Keys.SPACE -> {
+                        clearLights()
+                        return true
+                    }
+                    Keys.A -> {
+                        additive = !additive
+                        return true
+                    }
+                    Keys.S -> {
+                        softShadows = !softShadows
+                        return true
+                    }
+                    else -> return false
                 }
-                return false
             }
         }
 
@@ -95,14 +101,12 @@ class ShadowMap(val app: App) : KtxScreen {
 
     override fun render(delta: Float) {
         // clear frame
-        Gdx.gl.glClearColor(0.25f, 0.25f, 0.25f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        clearScreen(0.25f, 0.25f, 0.25f)
 
         val mx = Gdx.input.x.toFloat()
-        val my = (Gdx.graphics.height - Gdx.input.y).toFloat()
+        val my = app.height - Gdx.input.y
 
-        if (additive)
-            app.sb.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+        if (additive) app.sb.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
 
         for (i in 0 until lights.size) {
             val o = lights[i]
@@ -113,26 +117,23 @@ class ShadowMap(val app: App) : KtxScreen {
             renderLight(o)
         }
 
-        if (additive)
-            app.sb.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        if (additive) app.sb.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         // STEP 4. render sprites in full colour
-        app.sb.begin()
-
-        app.sb.shader = null //default shader
-        app.sb.draw(casterSprites, 0f, 0f)
-
-        app.sb.end()
+        app.sb.use {
+            it.shader = null //default shader
+            it.draw(casterSprites, 0f, 0f, app.width, app.height)
+        }
     }
 
     internal fun clearLights() {
         lights.clear()
-        lights.add(Light(Gdx.input.x.toFloat(), (Gdx.graphics.height - Gdx.input.y).toFloat(), Color.WHITE))
+        lights.add(Light(Gdx.input.x.toFloat(), app.height - Gdx.input.y, Color.WHITE))
     }
 
-    private fun renderLight(o: Light) {
-        val mx = o.x
-        val my = o.y
+    private fun renderLight(light: Light) {
+        val mx = light.x
+        val my = light.y
 
         // STEP 1. render light region to occluder FBO
 
@@ -140,8 +141,7 @@ class ShadowMap(val app: App) : KtxScreen {
         occludersFBO.begin()
 
         // clear the FBO
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        clearScreen(0f, 0f, 0f, 0f)
 
         // set the orthographic camera to the size of our FBO
         app.cam.setToOrtho(false, occludersFBO.width.toFloat(), occludersFBO.height.toFloat())
@@ -155,12 +155,11 @@ class ShadowMap(val app: App) : KtxScreen {
         // set up our batch for the occluder pass
         app.sb.projectionMatrix = app.cam.combined
         app.sb.shader = null //use default shader
-        app.sb.begin()
-        // ... draw any sprites that will cast shadows here ... //
-        app.sb.draw(casterSprites, 0f, 0f)
-
-        // end the batch before unbinding the FBO
-        app.sb.end()
+        app.sb.use {
+            // ... draw any sprites that will cast shadows here ... //
+            it.draw(casterSprites, 0f, 0f, app.width, app.height)
+            // end the batch before unbinding the FBO
+        }
 
         // unbind the FBO
         occludersFBO.end()
@@ -171,24 +170,21 @@ class ShadowMap(val app: App) : KtxScreen {
         shadowMapFBO.begin()
 
         // clear it
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        clearScreen(0f, 0f, 0f, 0f)
 
         // set our shadow map shader
         app.sb.shader = shadowMapShader
-        app.sb.begin()
-        shadowMapShader.setUniformf("resolution", lightSize.toFloat(), lightSize.toFloat())
-        shadowMapShader.setUniformf("upScale", upScale)
+        app.sb.use {
+            shadowMapShader.setUniformf("resolution", lightSize.toFloat(), lightSize.toFloat())
+            shadowMapShader.setUniformf("upScale", upScale)
 
-        // reset our projection matrix to the FBO size
-        app.cam.setToOrtho(false, shadowMapFBO.width.toFloat(), shadowMapFBO.height.toFloat())
-        app.sb.projectionMatrix = app.cam.combined
+            // reset our projection matrix to the FBO size
+            app.cam.setToOrtho(false, shadowMapFBO.width.toFloat(), shadowMapFBO.height.toFloat())
+            it.projectionMatrix = app.cam.combined
 
-        // draw the occluders texture to our 1D shadow map FBO
-        app.sb.draw(occluders.texture, 0f, 0f, lightSize.toFloat(), shadowMapFBO.height.toFloat())
-
-        // flush batch
-        app.sb.end()
+            // draw the occluders texture to our 1D shadow map FBO
+            it.draw(occluders.texture, 0f, 0f, lightSize.toFloat(), shadowMapFBO.height.toFloat())
+        }
 
         // unbind shadow map FBO
         shadowMapFBO.end()
@@ -201,20 +197,18 @@ class ShadowMap(val app: App) : KtxScreen {
 
         // set the shader which actually draws the light/shadow
         app.sb.shader = shadowRenderShader
-        app.sb.begin()
 
-        shadowRenderShader.setUniformf("resolution", lightSize.toFloat(), lightSize.toFloat())
-        shadowRenderShader.setUniformf("softShadows", if (softShadows) 1f else 0f)
-        // set color to light
-        app.sb.color = o.color
+        app.sb.use {
+            shadowRenderShader.setUniformf("resolution", lightSize.toFloat(), lightSize.toFloat())
+            shadowRenderShader.setUniformf("softShadows", if (softShadows) 1f else 0f)
+            // set color to light
+            it.color = light.color
 
-        val finalSize = lightSize * upScale
+            val finalSize = lightSize * upScale
 
-        // draw centered on light position
-        app.sb.draw(shadowMap1D.texture, mx - finalSize / 2f, my - finalSize / 2f, finalSize, finalSize)
-
-        // flush the batch before swapping shaders
-        app.sb.end()
+            // draw centered on light position
+            it.draw(shadowMap1D.texture, mx - finalSize / 2f, my - finalSize / 2f, finalSize, finalSize)
+        }
 
         // reset color
         app.sb.color = Color.WHITE
