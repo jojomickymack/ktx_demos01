@@ -16,8 +16,6 @@ varying LOWP vec4 v_color;
 uniform sampler2D u_texture;
 uniform vec2 resolution;
 
-uniform float softShadows;
-
 //sample from the distance map
 float sample(vec2 coord, float r) {
   return step(r, texture2D(u_texture, coord).r);
@@ -35,7 +33,7 @@ void main(void) {
 	vec2 tc = vec2(coord, 0.0);
 	
 	//the center tex coord, which gives us hard shadows
-	float center = sample(vec2(tc.x, tc.y), r);        
+	float center = sample(vec2(tc.x, tc.y), r);
 	
 	//we multiply the blur amount by our distance from center
 	//this leads to more blurriness as the shadow "fades away"
@@ -57,7 +55,7 @@ void main(void) {
 	sum += sample(vec2(tc.x + 4.0 * blur, tc.y), r) * 0.05;
 	
 	//1.0 -> in light, 0.0 -> in shadow
- 	float lit = mix(center, sum, softShadows);
+ 	float lit = mix(center, sum, 1.0f);
  	
  	//multiply the summed amount by our distance, which gives us a radial falloff
  	//then multiply by vertex (light) color  
