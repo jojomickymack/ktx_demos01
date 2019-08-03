@@ -177,6 +177,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
         addScreen(Vignette(this))
         addScreen(SimplexNoise(this))
         addScreen(Twist(this))
+        addScreen(Normals(this))
         addScreen(NormalsLighting(this))
         addScreen(Lightshafts(this))
         addScreen(Water(this))
@@ -210,6 +211,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "model-tinted" -> setScreen<ModelTinted>()
             "model-custom-shader" -> setScreen<ModelCustomShader>()
             "model-animated" -> setScreen<ModelAnimated>()
+            "model-normals" -> setScreen<Normals>()
 
             // opengl
             "depthtest" -> setScreen<DepthTest>()
@@ -224,7 +226,7 @@ class App(val gameChoice: String) : KtxGame<Screen>() {
             "vignette" -> setScreen<Vignette>()
             "simplex" -> setScreen<SimplexNoise>()
             "twist" -> setScreen<Twist>()
-            "normals" -> setScreen<NormalsLighting>()
+            "normals-lighting" -> setScreen<NormalsLighting>()
             "lightshafts" -> setScreen<Lightshafts>()
             "water" -> setScreen<Water>()
             "fisheye" -> setScreen<Fisheye>()

@@ -57,18 +57,19 @@ class Menu(val app: App) : KtxScreen {
 
             // bullet
             textButton("shooter test") { onClick { app.setScreen<ShooterTest>() } }.cell(row = true)
-
+/*
             // opengl
             textButton("depth test") { onClick { app.setScreen<DepthTest>() } }.cell(row = true)
             textButton("triangle") { onClick { app.setScreen<TriangleDemo>() } }.cell(row = true)
             textButton("shadow-map") { onClick { app.setScreen<ShadowMap>() } }.cell(row = true)
-
+*/
             // models
             textButton("model") { onClick { app.setScreen<ModelView>() } }.cell(row = true)
             textButton("model tinted") { onClick { app.setScreen<ModelTinted>() } }.cell(row = true)
             textButton("model shader") { onClick { app.setScreen<ModelCustomShader>() } }.cell(row = true)
             textButton("model animated") { onClick { app.setScreen<ModelAnimated>() } }.cell(row = true)
-
+            textButton("normals") { onClick { app.setScreen<Normals>() } }.cell(row = true)
+/*
             // box2d
             textButton("gravity") { onClick { app.setScreen<SimpleGravity>() } }.cell(row = true)
             textButton("mouse joint") { onClick { app.setScreen<MouseJoint>() } }.cell(row = true)
@@ -76,7 +77,7 @@ class Menu(val app: App) : KtxScreen {
             textButton("launcher") { onClick { app.setScreen<LauncherDemo>() } }.cell(row = true)
             textButton("orbit") { onClick { app.setScreen<OrbitDemo>() } }.cell(row = true)
             textButton("attractor") { onClick { app.setScreen<Attractor>() } }.cell(row = true)
-/*
+*/
             // shaders
             textButton("blur") { onClick { app.setScreen<Blur>() } }.cell(row = true)
             textButton("negative") { onClick { app.setScreen<Negative>() } }.cell(row = true)
@@ -90,7 +91,6 @@ class Menu(val app: App) : KtxScreen {
             textButton("water") { onClick { app.setScreen<Water>() } }.cell(row = true)
             textButton("fisheye") { onClick { app.setScreen<Fisheye>() } }.cell(row = true)
             textButton("color offset") { onClick { app.setScreen<ColorOffset>() } }.cell(row = true)
-*/
 
         }
 

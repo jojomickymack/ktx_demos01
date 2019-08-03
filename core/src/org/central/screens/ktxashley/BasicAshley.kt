@@ -2,7 +2,6 @@ package org.central.screens.ktxashley
 
 import java.math.RoundingMode
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
@@ -20,7 +19,6 @@ import ktx.collections.GdxArray
 import org.central.App
 import org.central.assets.Images.hero
 import org.central.assets.Images.enemy
-import org.central.assets.Images.default
 import kotlin.math.abs
 
 
@@ -40,15 +38,12 @@ class PhysicsComponent : Component {
     var h = 50f
     var rot = 0.0f
     var rect = Rectangle()
-    var direction = 1
     var topSpeed = 200f
 }
 
 class AiControlledComponent : Component
 
 class UserControlledComponent : Component
-
-class CameraFollowComponent : Component
 
 class BasicAshley(val app: App) : KtxScreen {
 
@@ -122,17 +117,6 @@ class BasicAshley(val app: App) : KtxScreen {
         }
     }
 
-    inner class CameraFollowSystem : IteratingSystem(allOf(PhysicsComponent::class, CameraFollowComponent::class).get()) {
-        private val pm = mapperFor<PhysicsComponent>()
-
-        override fun processEntity(entity: Entity, deltaTime: Float) {
-            val physics = pm[entity]
-
-            app.cam.position.x = physics.pos.x
-            app.cam.update()
-        }
-    }
-
     inner class RenderSystem : EntitySystem() {
         private var textures = ImmutableArray(GdxArray<Entity>())
 
@@ -179,7 +163,6 @@ class BasicAshley(val app: App) : KtxScreen {
             addSystem(RenderSystem())
             addSystem(UserControlledSystem())
             addSystem(AiControlledSystem())
-            addSystem(CameraFollowSystem())
         }
 
         ashleyEngine.add {
@@ -193,7 +176,6 @@ class BasicAshley(val app: App) : KtxScreen {
                     pos.set(0f, 0f)
                 }
                 with<UserControlledComponent> {}
-                //with<CameraFollowComponent> {}
             }
         }
 

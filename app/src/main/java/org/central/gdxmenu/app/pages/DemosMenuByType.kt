@@ -21,10 +21,10 @@ class DemosMenuByType : Fragment() {
     private var ktxActorsList = mutableListOf("event-listeners", "actor-extensions", "actor-sequences")
     private var ktxAshleyList = mutableListOf("basic-ashley")
     private var bulletList = mutableListOf("shooter-test")
-    private var modelList = mutableListOf("model", "model-tinted", "model-custom-shader", "model-animated")
+    private var modelList = mutableListOf("model", "model-tinted", "model-custom-shader", "model-animated", "model-normals")
     private var openglList = mutableListOf("triangle", "depthtest", "shadow-map")
     private var box2dList = mutableListOf("gravity", "mousejoints", "chain", "launcher", "orbit", "attractor")
-    private var shadersList = mutableListOf("negative", "grayscale", "sepia", "vignette", "simplex", "twist", "blur", "normals", "lightshafts", "water", "fisheye", "color-offset")
+    private var shadersList = mutableListOf("negative", "grayscale", "sepia", "vignette", "simplex", "twist", "blur", "normals-lighting", "lightshafts", "water", "fisheye", "color-offset")
 
     lateinit var adapter: MainDemosByTypeAdaptor
     var chosenType = ""
