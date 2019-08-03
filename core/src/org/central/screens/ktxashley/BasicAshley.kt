@@ -9,6 +9,9 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.ashley.core.*
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.ashley.utils.ImmutableArray
+import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.math.MathUtils
+import ktx.app.KtxInputAdapter
 import ktx.ashley.*
 import ktx.graphics.use
 import ktx.app.KtxScreen
@@ -51,6 +54,9 @@ class BasicAshley(val app: App) : KtxScreen {
 
     private val ashleyEngine = Engine()
 
+    private var playerTarget = Vector2(0f, 0f)
+    private var playerLocation = Vector2(0f, 0f)
+
     /**
      * systems
      */
@@ -60,7 +66,11 @@ class BasicAshley(val app: App) : KtxScreen {
 
         public override fun processEntity(entity: Entity, deltaTime: Float) {
             val physics = pm[entity]
-            physics.vel.x = physics.topSpeed * physics.direction
+
+            with(physics) {
+                vel.x = if (playerLocation.x > pos.x) topSpeed else -topSpeed
+                vel.y = if (playerLocation.y > pos.y) topSpeed else -topSpeed
+            }
         }
     }
 
@@ -71,11 +81,16 @@ class BasicAshley(val app: App) : KtxScreen {
             val physics = pm[entity]
 
             with(physics) {
-                if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) vel.x = -topSpeed
-                if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) vel.x = topSpeed
-                if (Gdx.input.isKeyPressed(Input.Keys.UP)) vel.y = topSpeed
-                if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) vel.y = -topSpeed
+                if (pos.dst(playerTarget) < 10) {
+                    vel.x = 0f
+                    vel.y = 0f
+                } else {
+                    vel.x = if (playerTarget.x > pos.x) topSpeed else -topSpeed
+                    vel.y = if (playerTarget.y > pos.y) topSpeed else -topSpeed
+                }
             }
+
+            playerLocation = physics.pos
         }
     }
 
@@ -146,7 +161,8 @@ class BasicAshley(val app: App) : KtxScreen {
     }
 
     private fun initializeDimensions(width: Int, height: Int) {
-
+        app.cam.setToOrtho(false, width.toFloat(), height.toFloat())
+        app.cam.update()
     }
 
     override fun resize(width: Int, height: Int) {
@@ -156,6 +172,7 @@ class BasicAshley(val app: App) : KtxScreen {
 
     override fun show() {
         initializeDimensions(app.width.toInt(), app.height.toInt())
+        Gdx.input.inputProcessor = InputMultiplexer(inputProcessor, app.hudStg)
 
         with(ashleyEngine) {
             addSystem(PhysicsSystem())
@@ -171,25 +188,37 @@ class BasicAshley(val app: App) : KtxScreen {
                     region = TextureRegion(hero())
                 }
                 with<PhysicsComponent> {
-                    w = 30f
-                    h = 50f
-                    pos.set(200f, 200f)
+                    w = 100f
+                    h = 100f
+                    pos.set(0f, 0f)
                 }
                 with<UserControlledComponent> {}
-                with<CameraFollowComponent> {}
+                //with<CameraFollowComponent> {}
             }
-            entity {
-                with<TextureComponent> {
-                    region = TextureRegion(enemy())
+        }
+
+        for (i in 0 until 300) {
+            ashleyEngine.add {
+                entity {
+                    with<TextureComponent> {
+                        region = TextureRegion(enemy())
+                    }
+                    with<PhysicsComponent> {
+                        w = 40f
+                        h = 40f
+                        topSpeed = 100f
+                        pos.set(MathUtils.random(app.width), MathUtils.random(app.height))
+                    }
+                    with<AiControlledComponent> {}
                 }
-                with<PhysicsComponent> {
-                    w = 40f
-                    h = 40f
-                    topSpeed = 100f
-                    pos.set(100f, 200f)
-                }
-                with<AiControlledComponent> {}
             }
+        }
+    }
+
+    private val inputProcessor = object : KtxInputAdapter {
+        override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+            playerTarget.set(screenX.toFloat(), app.height - screenY.toFloat())
+            return false
         }
     }
 
@@ -197,6 +226,7 @@ class BasicAshley(val app: App) : KtxScreen {
         clearScreen(0.6f, 0.6f, 0.6f)
 
         ashleyEngine.update(delta)
+        app.drawFps()
     }
 
     override fun dispose() {

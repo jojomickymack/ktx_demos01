@@ -187,6 +187,8 @@ class ModelCustomShader(val app: App) : KtxScreen {
         lightX += lightXInc
         if (lightX > lightXRange || lightX < -lightXRange) lightXInc *= -1
         directionalLight.set(1f, 1f, 1f, lightX, -20f, -50f)
+
+        app.drawFps()
     }
 
     override fun dispose() {

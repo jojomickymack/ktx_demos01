@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef
 import com.badlogic.gdx.physics.box2d.PolygonShape
 import ktx.app.KtxScreen
 import ktx.app.KtxInputAdapter
+import ktx.app.clearScreen
 import ktx.box2d.body
 import ktx.box2d.mouseJointWith
 import org.central.App
@@ -149,6 +150,8 @@ class ChainDemo(val app: App) : KtxScreen {
         }
 
         segmentShape.dispose()
+
+        app.cam.update()
     }
 
     private val stepTime = 1f/45f
@@ -165,14 +168,11 @@ class ChainDemo(val app: App) : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        app.cam.update()
         stepWorld()
 
-        // next we clear the color buffer and set the camera
-        // matrices
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-
+        clearScreen(0f, 0f, 0f)
         debugRenderer.render(world, app.cam.combined)
+        app.drawFps()
     }
 
     /** we instantiate this vector and the callback here so we don't irritate the GC  */

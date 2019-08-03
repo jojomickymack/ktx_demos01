@@ -8,6 +8,7 @@ import ktx.app.KtxScreen
 import org.central.App
 import com.badlogic.gdx.graphics.VertexAttribute
 import com.badlogic.gdx.graphics.Mesh
+import com.badlogic.gdx.math.*
 import com.badlogic.gdx.utils.GdxRuntimeException
 import ktx.app.clearScreen
 import ktx.graphics.use
@@ -31,11 +32,9 @@ class TriangleDemo(val app: App) : KtxScreen {
     private val green = Color.GREEN
     private val blue = Color.BLUE
 
-    private var x = 0f
-    private var y = 0f
-    private var triangleWidth = app.width
-    private var triangleHeight = app.height
     private var margin = 50
+
+    private var rotate = 0.0f
 
     private var triangleMesh = Mesh(true, MAX_VERTS, 0,
             VertexAttribute(Usage.Position, POSITION_COMPONENTS, "a_position"),
@@ -47,16 +46,17 @@ class TriangleDemo(val app: App) : KtxScreen {
         colorBlendShader = ShaderProgram(Gdx.files.internal("shaders/default.vert"), Gdx.files.internal("shaders/passthrough.frag"))
         if (!colorBlendShader.isCompiled) throw GdxRuntimeException("Could not compile shader: ${colorBlendShader.log}")
 
-        x = 0f
-        y = 0f
-        triangleWidth = width.toFloat()
-        triangleHeight = height.toFloat()
+        val shortSide = if (width > height) height.toFloat() else width.toFloat()
         margin = 50
 
-        val verts = floatArrayOf(x + margin, y + margin, red.r, red.g, red.b, red.a,
-                x + triangleWidth / 2, y + triangleHeight - margin, green.r, green.g, green.b, green.a,
-                x + triangleWidth - margin, y + margin, blue.r, blue.g, blue.b, blue.a)
+        val verts = floatArrayOf(-shortSide / 2 + margin, -shortSide / 2 + margin, red.r, red.g, red.b, red.a,
+                0f, shortSide / 2 - margin, green.r, green.g, green.b, green.a,
+                shortSide / 2 - margin, -shortSide / 2 + margin, blue.r, blue.g, blue.b, blue.a)
         triangleMesh.setVertices(verts)
+
+        app.cam.setToOrtho(false, width.toFloat(), height.toFloat())
+        app.cam.translate(-width.toFloat() / 2, -height.toFloat() / 2)
+        app.cam.update()
     }
 
     override fun resize(width: Int, height: Int) {
@@ -70,14 +70,17 @@ class TriangleDemo(val app: App) : KtxScreen {
     }
 
     override fun render(delta: Float) {
+        rotate += 0.01f
+
         clearScreen(0.6f, 0.6f, 0.6f)
 
-        app.cam.setToOrtho(false, app.width, app.height)
+        val rotateMatrix = Matrix4()
+        rotateMatrix.rotate(0f, 0f, rotate, 1f)
+        triangleMesh.transform(rotateMatrix)
 
         colorBlendShader.use {
             //update the projection matrix so our triangles are rendered in 2D
             it.setUniformMatrix("u_projTrans", app.cam.combined)
-
             triangleMesh.render(it, GL20.GL_TRIANGLES, 0, NUM_COMPONENTS)
         }
     }

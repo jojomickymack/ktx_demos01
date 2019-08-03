@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.QueryCallback
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint
 import ktx.app.KtxInputAdapter
 import ktx.app.KtxScreen
+import ktx.app.clearScreen
 import ktx.box2d.body
 import ktx.box2d.createWorld
 import ktx.box2d.mouseJointWith
@@ -136,6 +137,8 @@ class OrbitDemo(val app: App) : KtxScreen {
 
         planets += planet
         orbitRadii = orbitRadii + planet.position.dst(sun.position)
+
+        app.cam.update()
     }
 
     private val stepTime = 1f / 45f
@@ -177,11 +180,12 @@ class OrbitDemo(val app: App) : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        app.cam.update()
+        stepWorld()
+
+        clearScreen(0f, 0f, 0f)
         planets.forEachIndexed { i, planet ->
             rotatePlanetAroundSun(planet, sun, orbitRadii[i])
         }
-        stepWorld()
         debugRenderer.render(world, app.cam.combined)
     }
 

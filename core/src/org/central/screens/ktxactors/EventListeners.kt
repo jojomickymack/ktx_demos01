@@ -114,6 +114,8 @@ class EventListeners(val app: App) : KtxScreen {
         clearScreen(0.6f, 0.6f, 0.6f)
         app.stg.act()
         app.stg.draw()
+
+        app.drawFps()
     }
 
     override fun dispose() {

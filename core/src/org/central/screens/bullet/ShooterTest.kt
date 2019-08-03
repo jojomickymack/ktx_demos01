@@ -226,6 +226,8 @@ class ShooterTest(val app: App) : KtxScreen {
             app.modelBatch.render(e.modelInstance, environment)
         }
         app.modelBatch.end()
+
+        app.drawFps()
     }
 
     fun shoot(x: Float, y: Float, impulse: Float = 30f): BulletEntity {

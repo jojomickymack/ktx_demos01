@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Timer
 import com.badlogic.gdx.utils.Timer.Task
 import ktx.app.KtxInputAdapter
 import ktx.app.KtxScreen
+import ktx.app.clearScreen
 import ktx.box2d.body
 import ktx.box2d.createWorld
 import ktx.box2d.mouseJointWith
@@ -160,6 +161,8 @@ class Attractor(val app: App) : KtxScreen {
                 attract = !attract
             }
         }, 5f)
+
+        app.cam.update()
     }
 
     private val stepTime = 1f / 45f
@@ -189,12 +192,14 @@ class Attractor(val app: App) : KtxScreen {
             }, 5f)
         }
 
-        app.cam.update()
+        stepWorld()
+
+        clearScreen(0f, 0f, 0f)
         bodyList.forEachIndexed { i, planet ->
             rotatePlanetAroundSun(planet, sun)
         }
-        stepWorld()
         debugRenderer.render(world, app.cam.combined)
+        app.drawFps()
     }
 
     /** we instantiate this vector and the callback here so we don't irritate the GC  */

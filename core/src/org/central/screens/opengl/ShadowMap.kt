@@ -91,6 +91,8 @@ class ShadowMap(val app: App) : KtxScreen {
             it.shader = null //default shader
             it.draw(casterSprites, 0f, 0f, app.width, app.height)
         }
+
+        app.drawFps()
     }
 
     private fun renderLight(light: Light) {

@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import ktx.app.KtxInputAdapter
 import ktx.app.KtxScreen
+import ktx.app.clearScreen
 import ktx.box2d.body
 import ktx.box2d.createWorld
 import org.central.App
@@ -59,6 +60,7 @@ class SimpleGravity(val app: App) : KtxScreen {
     override fun show() {
         Gdx.input.inputProcessor = InputMultiplexer(inputProcessor, app.hudStg)
         initializeDimensions(app.width.toInt(), app.height.toInt())
+        app.cam.update()
     }
 
     private val stepTime = 1f/45f
@@ -75,9 +77,11 @@ class SimpleGravity(val app: App) : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        app.cam.update()
         stepWorld()
+
+        clearScreen(0f, 0f, 0f)
         debugRenderer.render(world, app.cam.combined)
+        stepWorld()
     }
 
     private val inputProcessor = object : KtxInputAdapter {

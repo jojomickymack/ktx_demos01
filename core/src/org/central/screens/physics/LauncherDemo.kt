@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef
 import ktx.app.KtxInputAdapter
 import ktx.app.KtxScreen
+import ktx.app.clearScreen
 import ktx.box2d.createWorld
 import ktx.box2d.body
 import org.central.App
@@ -117,6 +118,8 @@ class LauncherDemo(val app: App) : KtxScreen {
         val revJointAnchor = Vector2(seeSaw.position.x, seeSaw.position.y)
         revJointDef.initialize(bottom, seeSaw, revJointAnchor)
         world.createJoint(revJointDef)
+
+        app.cam.update()
     }
 
     private val stepTime = 1f/45f
@@ -140,9 +143,11 @@ class LauncherDemo(val app: App) : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        app.cam.update()
         stepWorld()
+
+        clearScreen(0f, 0f, 0f)
         debugRenderer.render(world, app.cam.combined)
+        app.drawFps()
     }
 
     override fun dispose() {
